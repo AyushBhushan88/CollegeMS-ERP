@@ -1,0 +1,26 @@
+# Node.js
+node_modules
+dist
+.next
+.turbo
+*.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+
+# Testing
+coverage
+
+# Project Specific
+docs/
+.planning/

@@ -1,0 +1,182 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: campuscore-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: campuscore
+      POSTGRES_PASSWORD: campuscore_password
+      POSTGRES_DB: campuscore_erp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: campuscore-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: campuscore-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: campuscore
+      RABBITMQ_DEFAULT_PASS: campuscore_password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  minio:
+    image: minio/minio
+    container_name: campuscore-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: campuscore_admin
+      MINIO_ROOT_PASSWORD: campuscore_password
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: campuscore-elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.0
+    container_name: campuscore-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: campuscore-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: campuscore-auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - JWT_SECRET=supersecret
+      - PORT=3001
+    depends_on:
+      - postgres
+
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    container_name: campuscore-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - STUDENT_SERVICE_URL=http://student-service:3002
+      - ADMISSION_SERVICE_URL=http://admission-service:3004
+      - FINANCE_SERVICE_URL=http://finance-service:3003
+      - COMMUNICATION_SERVICE_URL=http://communication-service:3006
+      - JWT_SECRET=supersecret
+    depends_on:
+      - auth-service
+      - student-service
+      - admission-service
+      - finance-service
+      - communication-service
+
+  student-service:
+    build:
+      context: .
+      dockerfile: services/student-service/Dockerfile
+    container_name: campuscore-student-service
+    ports:
+      - "3002:3002"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3002
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  admission-service:
+    build:
+      context: .
+      dockerfile: services/admission-service/Dockerfile
+    container_name: campuscore-admission-service
+    ports:
+      - "3004:3004"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3004
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  finance-service:
+    build:
+      context: .
+      dockerfile: services/finance-service/Dockerfile
+    container_name: campuscore-finance-service
+    ports:
+      - "3003:3003"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3003
+      - RAZORPAY_KEY_ID=your_key_id
+      - RAZORPAY_KEY_SECRET=your_key_secret
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  communication-service:
+    build:
+      context: .
+      dockerfile: services/communication-service/Dockerfile
+    container_name: campuscore-communication-service
+    ports:
+      - "3006:3006"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3006
+      - SMTP_HOST=mailhog
+      - SMTP_PORT=1025
+    depends_on:
+      - postgres
+      - rabbitmq
+      - mailhog
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  minio_data:
+  elasticsearch_data:
