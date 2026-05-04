@@ -48,4 +48,22 @@ export class NotificationsService {
       applicationId,
     });
   }
+
+  async notifyLeaveApproved(data: any) {
+    const { employeeId, employeeName, leaveType, startDate, endDate } = data;
+    const message = `Dear ${employeeName}, your ${leaveType} leave from ${startDate} to ${endDate} has been approved.`;
+    this.notificationsGateway.sendNotification(employeeId, 'LEAVE_APPROVED', { message });
+  }
+
+  async notifyBookOverdue(data: any) {
+    const { studentId, studentName, bookTitle, dueDate, fineAmount } = data;
+    const message = `Alert ${studentName}: The book "${bookTitle}" is overdue since ${dueDate}. Current fine: ${fineAmount}. Please return it immediately.`;
+    this.notificationsGateway.sendNotification(studentId, 'BOOK_OVERDUE', { message });
+  }
+
+  async notifyRoomAllocated(data: any) {
+    const { studentId, studentName, hostelName, roomNumber } = data;
+    const message = `Hello ${studentName}, you have been allocated Room ${roomNumber} in ${hostelName}.`;
+    this.notificationsGateway.sendNotification(studentId, 'ROOM_ALLOCATED', { message });
+  }
 }

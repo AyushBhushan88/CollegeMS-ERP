@@ -39,6 +39,39 @@ export class EventsService implements OnModuleInit {
         },
       );
 
+      // Subscribe to LEAVE_APPROVED
+      await eventBus.subscribe(
+        'hr',
+        'leave.approved',
+        'communication_leave_approved',
+        async (data) => {
+          this.logger.log(`Received leave.approved event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyLeaveApproved(data);
+        },
+      );
+
+      // Subscribe to BOOK_OVERDUE
+      await eventBus.subscribe(
+        'library',
+        'book.overdue',
+        'communication_book_overdue',
+        async (data) => {
+          this.logger.log(`Received book.overdue event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyBookOverdue(data);
+        },
+      );
+
+      // Subscribe to ROOM_ALLOCATED
+      await eventBus.subscribe(
+        'hostel',
+        'room.allocated',
+        'communication_room_allocated',
+        async (data) => {
+          this.logger.log(`Received room.allocated event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyRoomAllocated(data);
+        },
+      );
+
       this.logger.log('Successfully subscribed to all events');
     } catch (error) {
       this.logger.error('Failed to subscribe to events', error.stack);
