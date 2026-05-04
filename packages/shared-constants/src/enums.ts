@@ -60,3 +60,28 @@ export enum DocumentStatus {
   VERIFIED = 'VERIFIED',
   REJECTED = 'REJECTED',
 }
+
+export enum DayOfWeek {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY',
+}
+
+export enum AttendanceStatus {
+  PRESENT = 'PRESENT',
+  ABSENT = 'ABSENT',
+  LATE = 'LATE',
+  EXCUSED = 'EXCUSED',
+}
+
+export enum ExamType {
+  INTERNAL = 'INTERNAL',
+  MIDTERM = 'MIDTERM',
+  END_SEMESTER = 'END_SEMESTER',
+  LAB = 'LAB',
+  VIVA = 'VIVA',
+}
