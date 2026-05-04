@@ -99,7 +99,7 @@ async function main() {
     },
   });
 
-  await prisma.branch.upsert({
+  const cseBranch = await prisma.branch.upsert({
     where: { code: 'CSE' },
     update: {},
     create: {
@@ -147,6 +147,52 @@ async function main() {
       dueDate: new Date('2024-08-31'),
     },
   });
+
+  // 5. Seed Subjects
+  console.log('Seeding subjects...');
+  const subjects = [
+    { code: 'CS101', name: 'Introduction to Programming', credits: 4, semester: 1, type: 'CORE' },
+    { code: 'MA101', name: 'Engineering Mathematics I', credits: 4, semester: 1, type: 'CORE' },
+    { code: 'PH101', name: 'Engineering Physics', credits: 3, semester: 1, type: 'CORE' },
+    { code: 'CS201', name: 'Data Structures', credits: 4, semester: 3, type: 'CORE' },
+  ];
+
+  for (const subject of subjects) {
+    await prisma.subject.upsert({
+      where: { code: subject.code },
+      update: {},
+      create: {
+        ...subject,
+        branchId: cseBranch.id,
+      },
+    });
+  }
+
+  // 6. Seed Sections
+  console.log('Seeding sections...');
+  const sections = [
+    { name: 'A', batchYear: 2024, semester: 1, capacity: 60 },
+    { name: 'B', batchYear: 2024, semester: 1, capacity: 60 },
+    { name: 'C', batchYear: 2023, semester: 3, capacity: 60 },
+  ];
+
+  for (const section of sections) {
+    await prisma.section.upsert({
+      where: {
+        branchId_batchYear_semester_name: {
+          branchId: cseBranch.id,
+          batchYear: section.batchYear,
+          semester: section.semester,
+          name: section.name,
+        },
+      },
+      update: {},
+      create: {
+        ...section,
+        branchId: cseBranch.id,
+      },
+    });
+  }
 
   console.log('Seeding completed successfully.');
 }
