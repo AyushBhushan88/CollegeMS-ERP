@@ -1,52 +1,56 @@
 # Project: CampusCore ERP
 
 ## Vision
-CampusCore is a comprehensive, microservices-based College ERP system designed to digitize and automate all aspects of educational institution management, including Academics, Finance, HR, Library, Hostel, and Placement.
+
+**CampusCore** is a comprehensive, cloud-ready College Enterprise Resource Planning (ERP) system designed to digitize and unify every operational dimension of a higher-education institution — from student admissions and academic scheduling to finance, HR, hostel management, and alumni relations.
 
 ## Core Value
-A unified, scalable, and secure platform that provides a single source of truth for students, faculty, and administration.
 
-## Stated Constraints
-- **Architecture**: pnpm Monorepo with Microservices (Next.js + NestJS).
-- **Database**: PostgreSQL (Prisma), Redis, RabbitMQ.
-- **Timeline**: Structured into multiple phases (Fine granularity).
-- **Security**: JWT-based RBAC, TLS 1.3, MFA.
+To be the single source of truth for every stakeholder in the college ecosystem — enabling data-driven decisions, frictionless operations, and an exceptional academic experience.
 
-## Requirements
+## Tech Stack
 
-### Validated
-(None yet — greenfield project)
+- **Frontend**: Next.js 14+ (React 18), Shadcn/UI + Tailwind CSS, Zustand / React Query.
+- **Backend**: Node.js (NestJS) or Python (FastAPI).
+- **Database**: PostgreSQL 16+, Redis 7+, Elasticsearch / Meilisearch.
+- **Infrastructure**: Docker + Kubernetes, MinIO/S3, RabbitMQ/Kafka.
+- **Security**: Keycloak/Auth.js (JWT, MFA, SSO, RBAC), TLS 1.3.
 
-### Active
-- [ ] Core Authentication & RBAC (40 routes)
-- [ ] Student Information System (31 routes)
-- [ ] Academic Management (Programs, Courses, Timetable - 63 routes)
-- [ ] Attendance Tracking (25 routes)
-- [ ] Examination & Results (51 routes)
-- [ ] Finance & Fee Management (50 routes)
-- [ ] HR & Payroll (36 routes)
-- [ ] Library Management (22 routes)
-- [ ] Hostel & Mess Management (27 routes)
-- [ ] Transport Management (15 routes)
-- [ ] Placement & Internships (32 routes)
-- [ ] Communication & Notifications (27 routes)
-- [ ] Reporting & Dashboards (NAAC/NIRF - 22 routes)
-- [ ] Grievance Redressal (16 routes)
-- [ ] Alumni Management (16 routes)
-- [ ] API Gateway & System Services (13 routes)
+## Scope (15 Modules)
 
-### Out of Scope
-- [Exclusion 1] — Legacy data migration from non-digital systems (unless specified later).
-- [Exclusion 2] — Mobile Native apps (Phase 1 focus is Web PWA).
+1. Admissions & Enrollment Management
+2. Student Information System (SIS)
+3. Academic & Curriculum Management
+4. Attendance Management
+5. Examination Management
+6. Fee & Finance Management
+7. Faculty & HR Management
+8. Library Management
+9. Hostel Management
+10. Transport Management
+11. Placement & Training Cell
+12. Communication & Notifications
+13. Reports & Analytics
+14. Grievance Redressal
+15. Alumni Management
+
+## Out of Scope
+
+- Full Learning Management System (LMS) content delivery.
+- Research Grant Management.
+- Alumni Fundraising.
+- AI-powered chatbot (Phase 4 candidate).
+- Mobile-native applications (PWA is in scope).
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Monorepo | Ease of code sharing and cross-service typing | — Pending |
-| Microservices | Scalability and independent deployment of modules | — Pending |
-| Fine Granularity | High complexity project requires detailed slicing | — Pending |
-| Sequential Execution | Ensure stability and clear audit trail in initial phases | — Pending |
+| Decision            | Rationale                                        | Outcome        |
+| ------------------- | ------------------------------------------------ | -------------- |
+| Microservices       | Independent scalability of modular services      | Approved (SRS) |
+| API-First           | Consistent communication across all clients      | Approved (SRS) |
+| Multi-Channel Comms | Support for in-app, email, and SMS notifications | Approved (PRD) |
+| Multi-Tenant Ready  | Architected for multi-campus institution support | Approved (PRD) |
 
 ---
-*Last updated: 2026-04-26 after initialization*
+
+_Initialized from PRD v1.0 and SRS v1.0_

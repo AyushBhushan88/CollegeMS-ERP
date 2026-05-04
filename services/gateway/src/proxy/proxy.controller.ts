@@ -16,29 +16,70 @@ export class ProxyController {
       changeOrigin: true,
       pathRewrite: { '^/student': '' },
     }),
-  };
+    academic: createProxyMiddleware({
+      target: process.env.ACADEMIC_SERVICE_URL || 'http://localhost:3008',
+      changeOrigin: true,
+      pathRewrite: { '^/academic': '' },
+    }),
+    attendance: createProxyMiddleware({
+      target: process.env.ATTENDANCE_SERVICE_URL || 'http://localhost:3010',
+      changeOrigin: true,
+      pathRewrite: { '^/attendance': '' },
+    }),
+    examination: createProxyMiddleware({
+      target: process.env.EXAMINATION_SERVICE_URL || 'http://localhost:3009',
+      changeOrigin: true,
+      pathRewrite: { '^/examination': '' },
+    }),
+    };
 
-  @Public()
-  @All('auth/*')
-  async proxyAuth(@Req() req: Request, @Res() res: Response) {
+    @Public()
+    @All('auth/*')
+    async proxyAuth(@Req() req: Request, @Res() res: Response) {
     this.proxies.auth(req, res, (err) => {
       if (err) {
         res.status(500).send(err.message);
       }
     });
-  }
+    }
 
-  @All('student/*')
-  async proxyStudent(@Req() req: Request, @Res() res: Response) {
+    @All('student/*')
+    async proxyStudent(@Req() req: Request, @Res() res: Response) {
     this.proxies.student(req, res, (err) => {
       if (err) {
         res.status(500).send(err.message);
       }
     });
-  }
-  
-  @All('api/v1/students/*')
-  async proxyStudentV1(@Req() req: Request, @Res() res: Response) {
+    }
+
+    @All('academic/*')
+    async proxyAcademic(@Req() req: Request, @Res() res: Response) {
+    this.proxies.academic(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+    }
+
+    @All('attendance/*')
+    async proxyAttendance(@Req() req: Request, @Res() res: Response) {
+    this.proxies.attendance(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+    }
+
+    @All('examination/*')
+    async proxyExamination(@Req() req: Request, @Res() res: Response) {
+    this.proxies.examination(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+    }
+
+    @All('api/v1/students/*')  async proxyStudentV1(@Req() req: Request, @Res() res: Response) {
       // Map to student service as well
       this.proxies.student(req, res, (err) => {
           if (err) {

@@ -1,4 +1,13 @@
-import { LayoutDashboard, FileText, User, CreditCard, GraduationCap } from 'lucide-react';
+import {
+  LayoutDashboard,
+  FileText,
+  User,
+  CreditCard,
+  GraduationCap,
+  BookOpen,
+  ClipboardCheck,
+  FileSignature,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
@@ -7,6 +16,9 @@ import { cn } from '@/lib/utils';
 
 const sidebarItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Academics', href: '/dashboard/academics', icon: BookOpen },
+  { name: 'Attendance', href: '/dashboard/attendance', icon: ClipboardCheck },
+  { name: 'Exams', href: '/dashboard/exams', icon: FileSignature },
   { name: 'Applications', href: '/dashboard/applications', icon: FileText },
   { name: 'Profile', href: '/dashboard/profile', icon: User },
   { name: 'Payments', href: '/dashboard/payments', icon: CreditCard },

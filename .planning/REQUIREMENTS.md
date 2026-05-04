@@ -1,141 +1,105 @@
 # Requirements: CampusCore ERP
 
-## v1 Requirements
+## Functional Requirements (from SRS v1.0)
 
-### Authentication & Authorization (AUTH)
-- [ ] **AUTH-01**: User registration with email/password (Admin & Student self-reg).
-- [ ] **AUTH-02**: JWT-based login with MFA support (TOTP).
-- [ ] **AUTH-03**: Role-Based Access Control (RBAC) with 16 predefined roles.
-- [ ] **AUTH-04**: Password management (Forgot/Reset/Change) with OTP verification.
-- [ ] **AUTH-05**: Session management and force logout capabilities.
-- [ ] **AUTH-06**: Profile management including avatar upload and preferences.
+### 1. Authentication & Authorization (AUTH)
 
-### Student Information System (STU)
-- [ ] **STU-01**: Comprehensive student profile CRUD (Personal, Academic, Documents).
-- [ ] **STU-02**: Semester enrollment and elective course selection.
-- [ ] **STU-03**: Student document vault for verification and storage.
-- [ ] **STU-04**: ID card generation (PDF) with QR code.
-- [ ] **STU-05**: Parent portal for ward's progress and fee monitoring.
-- [ ] **STU-06**: Bulk student import/export via CSV/Excel.
+- [ ] **FR-AUTH-001**: User Registration (Admin & Student self-reg).
+- [ ] **FR-AUTH-002**: User Login (MFA, JWT tokens).
+- [ ] **FR-AUTH-003**: Role-Based Access Control (RBAC) across 12+ roles.
+- [ ] **FR-AUTH-004**: Password Management (Reset via OTP, Reuse protection).
+- [ ] **FR-AUTH-005**: Session Management (Idle timeout, concurrent limits).
 
-### Academic Management (ACAD)
-- [ ] **ACAD-01**: Hierarchy management (Departments, Programs, Branches).
-- [ ] **ACAD-02**: Course catalog management (Syllabus, Credits, Prerequisites).
-- [ ] **ACAD-03**: Timetable generation and management with conflict detection.
-- [ ] **ACAD-04**: Academic calendar for events, holidays, and deadlines.
-- [ ] **ACAD-05**: Curriculum mapping (CO-PO mapping and attainment).
-- [ ] **ACAD-06**: Assignment management (Creation, Submission, Grading).
-- [ ] **ACAD-07**: Classroom and lab resource management.
+### 2. Admissions & Enrollment (ADM)
 
-### Attendance Tracking (ATT)
-- [ ] **ATT-01**: Daily attendance marking per course/session (Manual & Bulk).
-- [ ] **ATT-02**: Real-time attendance percentage calculation and status (Safe/Critical).
-- [ ] **ATT-03**: Automatic attendance shortage alerts to students/parents.
-- [ ] **ATT-04**: Student leave and On-Duty (OD) request workflow.
-- [ ] **ATT-05**: Faculty attendance and monthly reports.
+- [ ] **FR-ADM-001**: Online Application Submission (Multi-step, Document upload).
+- [ ] **FR-ADM-002**: Merit List Generation (Scoring formula, Reservations).
+- [ ] **FR-ADM-003**: Multi-Round Seat Allocation (Real-time vacancy tracking).
 
-### Examination & Results (EXAM)
-- [ ] **EXAM-01**: Exam scheduling and timetable publication.
-- [ ] **EXAM-02**: Hall ticket generation and eligibility checking.
-- [ ] **EXAM-03**: Seating arrangement generation and room mapping.
-- [ ] **EXAM-04**: Marks entry by faculty with multi-level locking.
-- [ ] **EXAM-05**: Automated grade calculation (SGPA/CGPA) and result publication.
-- [ ] **EXAM-06**: Backlog (ATKT) and revaluation management.
-- [ ] **EXAM-07**: Consolidated transcript generation.
+### 3. Student Information System (SIS)
 
-### Finance & Fee Management (FIN)
-- [ ] **FIN-01**: Dynamic fee structure configuration (Program/Batch wise).
-- [ ] **FIN-02**: Student fee ledger with balance tracking and installments.
-- [ ] **FIN-03**: Online payment integration (Razorpay/PayTM) with auto-receipts.
-- [ ] **FIN-04**: Scholarship application and disbursement tracking.
-- [ ] **FIN-05**: Payroll management for employees (Salary structures, Payslips).
-- [ ] **FIN-06**: Expense and budget tracking for departments.
-- [ ] **FIN-07**: Fee defaulter reporting and automated reminders.
+- [ ] **FR-SIS-001**: Student Profile Management (Personal, Academic, Medical).
+- [ ] **FR-SIS-002**: Student Enrollment & Registration (Course/Elective selection).
 
-### HR & Employee Management (HR)
-- [ ] **HR-01**: Employee profile CRUD and service records.
-- [ ] **HR-02**: Leave management with approval workflows and balances.
-- [ ] **HR-03**: Recruitment pipeline (Job postings, Applications, Interviews).
-- [ ] **HR-04**: Faculty workload allocation and tracking.
-- [ ] **HR-05**: Performance appraisal (Self-assessment and HOD review).
+### 4. Academic & Curriculum (ACA)
 
-### Library Management (LIB)
-- [ ] **LIB-01**: Book cataloging (OPAC) with bulk import.
-- [ ] **LIB-02**: Circulation management (Issue, Return, Renew, Reserve).
-- [ ] **LIB-03**: Fine calculation and collection.
-- [ ] **LIB-04**: Library usage and popular book reports.
+- [ ] **FR-ACA-001**: Program & Course Catalog (Credits, Prerequisites).
+- [ ] **FR-ACA-002**: Timetable Generation (Conflict-free automated scheduling).
+- [ ] **FR-ACA-003**: CO-PO Mapping & Assessment (OBE Compliance).
 
-### Hostel & Mess (HOST)
-- [ ] **HOST-01**: Hostel and room allocation management.
-- [ ] **HOST-02**: Mess menu management and attendance.
-- [ ] **HOST-03**: Hostel complaint and outing request tracking.
-- [ ] **HOST-04**: Visitor log and security monitoring.
+### 5. Attendance Management (ATT)
 
-### Placement & Internships (PLACE)
-- [ ] **PLACE-01**: Company database and placement drive management.
-- [ ] **PLACE-02**: Student drive registration and eligibility filtering.
-- [ ] **PLACE-03**: Interview round tracking and offer management.
-- [ ] **PLACE-04**: Internship opportunity tracking and completion.
+- [ ] **FR-ATT-001**: Lecture-wise Attendance Marking (Faculty interface).
+- [ ] **FR-ATT-002**: Automatic Shortage Alerts (Student & Parent notifications).
 
-### Communication & Notifications (COMM)
-- [ ] **COMM-01**: In-app notifications for all system events.
-- [ ] **COMM-02**: Notice board and circular management with acknowledgments.
-- [ ] **COMM-03**: Bulk Email/SMS/Push notifications.
+### 6. Examination Management (EXM)
 
-### Reports & Analytics (REPT)
-- [ ] **REPT-01**: Role-based dashboards with interactive widgets.
-- [ ] **REPT-02**: Standard reports (Enrollment, Finance, Performance).
-- [ ] **REPT-03**: Custom report builder for ad-hoc analysis.
-- [ ] **REPT-04**: NAAC/NIRF data extraction and bundle generation.
+- [ ] **FR-EXM-001**: Exam Scheduling (Conflict detection).
+- [ ] **FR-EXM-002**: Hall Ticket Generation (Eligibility based on fees/attendance).
+- [ ] **FR-EXM-003**: Marks Entry & Grade Calculation (Absolute/Relative/CBCS).
+- [ ] **FR-EXM-004**: Result Publication & Transcripts.
 
-### Grievance Redressal (GRIEV)
-- [ ] **GRIEV-01**: Grievance filing with anonymous options.
-- [ ] **GRIEV-02**: Automated routing to committees and SLA tracking.
+### 7. Fee & Finance Management (FIN)
 
-### Alumni Management (ALUM)
-- [ ] **ALUM-01**: Alumni directory and self-registration.
-- [ ] **ALUM-02**: Alumni events and mentorship matching.
+- [ ] **FR-FIN-001**: Fee Structure Configuration (Category-wise, installments).
+- [ ] **FR-FIN-002**: Online Fee Payment (UPI/Card/NetBanking, Receipt gen).
+- [ ] **FR-FIN-003**: Scholarship & Concession Management.
 
-### System & Infrastructure (SYS)
-- [ ] **SYS-01**: API Gateway with rate limiting and request logging.
-- [ ] **SYS-02**: Centralized file storage (MinIO/S3) with presigned URLs.
-- [ ] **SYS-03**: System audit logs and configuration management.
+### 8. Faculty & HR Management (HR)
 
-## v2 Requirements (Deferred)
-- [ ] AI-based predictive analytics for student performance.
-- [ ] Virtual classroom integration (Zoom/Teams).
-- [ ] Biometric device direct integration (Real-time).
-- [ ] Blockchain-verified digital degree issuance.
+- [ ] **FR-HR-001**: Leave Management (Approval workflow, Balance tracking).
 
-## Out of Scope
-- [ ] Hardware maintenance of college infrastructure.
-- [ ] Physical library book procurement.
+### 9. Library Management (LIB)
+
+- [ ] **FR-LIB-001**: Book Issue & Return (Barcode/QR scanning).
+
+### 10. Hostel Management (HST)
+
+- [ ] **FR-HST-001**: Hostel Room Allocation (Capacity tracking).
+
+### 11. Placement & Training (PLC)
+
+- [ ] **FR-PLC-001**: Placement Drive Management (Eligibility auto-filtering).
+
+### 12. Communication & Notifications (COM)
+
+- [ ] **FR-COM-001**: Multi-Channel Notifications (In-app, Email, SMS).
+
+### 13. Reports & Analytics (RPT)
+
+- [ ] **FR-RPT-001**: Executive Dashboard (Role-specific widgets).
+- [ ] **FR-RPT-002**: NAAC / NIRF Report Generation.
+
+### 14. Grievance Redressal (GRV)
+
+- [ ] **FR-GRV-001**: Grievance Lifecycle Tracking (SLA-based routing).
+
+## Non-Functional Requirements (Selection)
+
+- [ ] **NFR-P01**: Page load time ≤ 2 seconds.
+- [ ] **NFR-A01**: 99.9% Uptime SLA.
+- [ ] **NFR-S01**: Horizontal scalability via microservices.
+- [ ] **SR-08**: AES-256 data encryption at rest.
 
 ---
-## Traceability
-| Req ID | Phase |
-|--------|-------|
-| AUTH-01..06 | 2 |
-| STU-01..06 | 3 |
-| ACAD-01..02 | 4 |
-| ACAD-03..04 | 5 |
-| ACAD-05..07 | 4 |
-| ATT-01..05 | 6 |
-| EXAM-01..03 | 7 |
-| EXAM-04..07 | 8 |
-| FIN-01..03 | 9 |
-| FIN-04 | 9 |
-| FIN-05 | 10 |
-| FIN-06 | 9 |
-| FIN-07 | 9 |
-| HR-01..05 | 10 |
-| LIB-01..04 | 11 |
-| HOST-01..04 | 11 |
-| TRANS-01 | 11 |
-| PLACE-01..04 | 12 |
-| COMM-01..03 | 12 |
-| REPT-01..04 | 13 |
-| GRIEV-01..02 | 13 |
-| ALUM-01..02 | 12 |
-| SYS-01 | 2 |
-| SYS-02..03 | 1 |
+
+## Traceability Matrix (SRS → Phase)
+
+| Req ID     | Module     | Phase |
+| ---------- | ---------- | ----- |
+| FR-AUTH-\* | Auth       | 1     |
+| FR-ADM-\*  | Admissions | 1     |
+| FR-SIS-\*  | SIS        | 1     |
+| FR-FIN-\*  | Finance    | 1     |
+| FR-COM-\*  | Comms      | 1     |
+| FR-ACA-\*  | Academic   | 2     |
+| FR-ATT-\*  | Attendance | 2     |
+| FR-EXM-\*  | Exams      | 2     |
+| FR-HR-\*   | HR         | 3     |
+| FR-LIB-\*  | Library    | 3     |
+| FR-HST-\*  | Hostel     | 3     |
+| FR-TRN-\*  | Transport  | 3     |
+| FR-PLC-\*  | Placement  | 3     |
+| FR-RPT-\*  | Reports    | 3     |
+| FR-GRV-\*  | Grievance  | 4     |
+| FR-ALM-\*  | Alumni     | 4     |
