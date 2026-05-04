@@ -85,3 +85,56 @@ export enum ExamType {
   LAB = 'LAB',
   VIVA = 'VIVA',
 }
+
+export enum EmployeeStatus {
+  ACTIVE = 'ACTIVE',
+  ON_LEAVE = 'ON_LEAVE',
+  RESIGNED = 'RESIGNED',
+  TERMINATED = 'TERMINATED',
+}
+
+export enum LeaveType {
+  CASUAL = 'CASUAL',
+  SICK = 'SICK',
+  EARNED = 'EARNED',
+  MATERNITY = 'MATERNITY',
+  PATERNITY = 'PATERNITY',
+}
+
+export enum LeaveStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum BookStatus {
+  AVAILABLE = 'AVAILABLE',
+  ISSUED = 'ISSUED',
+  RESERVED = 'RESERVED',
+  LOST = 'LOST',
+  DAMAGED = 'DAMAGED',
+}
+
+export enum HostelType {
+  BOYS = 'BOYS',
+  GIRLS = 'GIRLS',
+}
+
+export enum RoomType {
+  SINGLE = 'SINGLE',
+  DOUBLE = 'DOUBLE',
+  TRIPLE = 'TRIPLE',
+}
+
+export enum RoomStatus {
+  AVAILABLE = 'AVAILABLE',
+  OCCUPIED = 'OCCUPIED',
+  MAINTENANCE = 'MAINTENANCE',
+}
+
+export enum PlacementStatus {
+  PENDING = 'PENDING',
+  OFFERED = 'OFFERED',
+  REJECTED = 'REJECTED',
+}
