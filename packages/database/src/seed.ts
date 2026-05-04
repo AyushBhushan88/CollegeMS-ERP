@@ -194,6 +194,78 @@ async function main() {
     });
   }
 
+  // 7. Seed Operations Data (HR, Library, Hostel, Transport, Placement)
+  console.log('Seeding operations data...');
+
+  const hrEmployee = await prisma.employeeProfile.upsert({
+    where: { employeeCode: 'EMP001' },
+    update: {},
+    create: {
+      userId: superAdminEmail, // linking to super admin for testing
+      user: {
+        connect: { email: superAdminEmail }
+      },
+      employeeCode: 'EMP001',
+      designation: 'Professor',
+      department: 'CSE',
+      joiningDate: new Date('2020-01-01'),
+      status: 'ACTIVE',
+      salary: 100000,
+    }
+  });
+
+  const book = await prisma.book.upsert({
+    where: { isbn: '978-3-16-148410-0' },
+    update: {},
+    create: {
+      title: 'Introduction to Algorithms',
+      isbn: '978-3-16-148410-0',
+      author: 'Thomas H. Cormen',
+      publisher: 'MIT Press',
+      subject: 'Computer Science',
+      copies: {
+        create: [
+          { accessionNumber: 'ACC001', status: 'AVAILABLE' }
+        ]
+      }
+    }
+  });
+
+  const hostel = await prisma.hostel.upsert({
+    where: { name: 'Boys Hostel A' },
+    update: {},
+    create: {
+      name: 'Boys Hostel A',
+      type: 'BOYS',
+      capacity: 100,
+      rooms: {
+        create: [
+          { roomNumber: '101', floor: 1, type: 'SINGLE', capacity: 1, status: 'AVAILABLE' }
+        ]
+      }
+    }
+  });
+
+  const route = await prisma.route.upsert({
+    where: { name: 'Route 1' },
+    update: {},
+    create: {
+      name: 'Route 1',
+      source: 'City Center',
+      destination: 'Campus',
+      stops: ['City Center', 'Subway', 'Campus']
+    }
+  });
+
+  const placementDrive = await prisma.placementDrive.create({
+    data: {
+      companyName: 'Tech Corp',
+      date: new Date('2025-01-01'),
+      eligibilityCriteria: { minCgpa: 7.5 },
+      packageDetails: '10 LPA'
+    }
+  });
+
   console.log('Seeding completed successfully.');
 }
 
