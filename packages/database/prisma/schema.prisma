@@ -64,6 +64,31 @@ enum TransactionStatus {
   REFUNDED
 }
 
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum ExamType {
+  INTERNAL
+  MIDTERM
+  END_SEMESTER
+  LAB
+  VIVA
+}
+
 model User {
   id               String   @id @default(uuid())
   email            String   @unique
@@ -83,6 +108,8 @@ model User {
   student          Student?
   applications     AdmissionApplication[]
   documents        Document[]
+  timetableSlots    TimetableSlot[] @relation("FacultySlots")
+  markedAttendance AttendanceRecord[] @relation("MarkedBy")
 }
 
 model Role {
@@ -114,6 +141,10 @@ model Branch {
   code        String   @unique
   description String?
   students    Student[]
+  subjects    Subject[]
+  sections    Section[]
+  exams       Exam[]
+  programOutcomes ProgramOutcome[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -143,10 +174,15 @@ model Student {
   guardianEmail     String?
   guardianRelation  String
   status            StudentStatus @default(ENROLLED)
+  sectionId         String?
+  section           Section?          @relation(fields: [sectionId], references: [id])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
   transactions      Transaction[]
+  attendance        AttendanceRecord[]
+  marks             MarksEntry[]
+  transcripts       Transcript[]
 }
 
 model AdmissionApplication {
@@ -215,4 +251,188 @@ model Transaction {
   metadata          Json?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  name        String
+  description String?
+  credits     Int
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  semester    Int
+  type        String   @default("CORE") // CORE, ELECTIVE, LAB
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  slots         TimetableSlot[]
+  marks         MarksEntry[]
+  attendance    AttendanceRecord[]
+  examSchedules ExamSchedule[]
+  courseOutcomes CourseOutcome[]
+}
+
+model Section {
+  id          String   @id @default(uuid())
+  name        String   // e.g., "A", "B", "C"
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  batchYear   Int
+  semester    Int
+  capacity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  students    Student[]
+  slots       TimetableSlot[]
+  attendance  AttendanceRecord[]
+  @@unique([branchId, batchYear, semester, name])
+}
+
+model TimetableSlot {
+  id          String    @id @default(uuid())
+  sectionId   String
+  section     Section   @relation(fields: [sectionId], references: [id])
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id])
+  facultyId   String    // References User.id where role=FACULTY
+  faculty     User      @relation("FacultySlots", fields: [facultyId], references: [id])
+  dayOfWeek   DayOfWeek
+  startTime   String    // HH:mm format
+  endTime     String    // HH:mm format
+  roomNumber  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([sectionId, dayOfWeek, startTime])
+  @@unique([facultyId, dayOfWeek, startTime])
+  @@unique([roomNumber, dayOfWeek, startTime])
+}
+
+model AttendanceRecord {
+  id          String           @id @default(uuid())
+  studentId   String
+  student     Student          @relation(fields: [studentId], references: [id])
+  subjectId   String
+  subject     Subject          @relation(fields: [subjectId], references: [id])
+  sectionId   String
+  section     Section          @relation(fields: [sectionId], references: [id])
+  date        DateTime
+  status      AttendanceStatus @default(PRESENT)
+  remarks     String?
+  markedById  String           // Faculty ID
+  markedBy    User             @relation("MarkedBy", fields: [markedById], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([studentId, subjectId, date])
+}
+
+model Exam {
+  id            String         @id @default(uuid())
+  name          String         // e.g., "End Sem Nov 2024"
+  type          ExamType
+  academicYear  String
+  semester      Int
+  branchId      String
+  branch        Branch         @relation(fields: [branchId], references: [id])
+  startDate     DateTime
+  endDate       DateTime
+  totalMarks    Int
+  weightage     Int            // % weightage for final result
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  schedules     ExamSchedule[]
+  marks         MarksEntry[]
+}
+
+model ExamSchedule {
+  id            String   @id @default(uuid())
+  examId        String
+  exam          Exam     @relation(fields: [examId], references: [id])
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  date          DateTime
+  startTime     String
+  endTime       String
+  roomNumber    String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([examId, subjectId])
+}
+
+model MarksEntry {
+  id            String   @id @default(uuid())
+  examId        String
+  exam          Exam     @relation(fields: [examId], references: [id])
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  studentId     String
+  student       Student  @relation(fields: [studentId], references: [id])
+  marksObtained Float
+  isAbsent      Boolean  @default(false)
+  remarks       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([examId, subjectId, studentId])
+}
+
+model Transcript {
+  id              String   @id @default(uuid())
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id])
+  semester        Int
+  sgpa            Float
+  cgpa            Float
+  totalCredits    Int
+  earnedCredits   Int
+  resultStatus    String   // PASS, FAIL, WITHHELD
+  isFinalized     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([studentId, semester])
+}
+
+model ProgramOutcome {
+  id          String   @id @default(uuid())
+  code        String
+  description String
+  branchId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjectCOPOs SubjectCOPO[]
+  @@unique([branchId, code])
+}
+
+model CourseOutcome {
+  id          String   @id @default(uuid())
+  code        String
+  description String
+  subjectId   String
+  subject     Subject  @relation(fields: [subjectId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subjectCOPOs SubjectCOPO[]
+  @@unique([subjectId, code])
+}
+
+model SubjectCOPO {
+  id               String         @id @default(uuid())
+  courseOutcomeId  String
+  courseOutcome    CourseOutcome  @relation(fields: [courseOutcomeId], references: [id])
+  programOutcomeId String
+  programOutcome   ProgramOutcome @relation(fields: [programOutcomeId], references: [id])
+  mappingStrength  Int            // 1, 2, or 3
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([courseOutcomeId, programOutcomeId])
 }
