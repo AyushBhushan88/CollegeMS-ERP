@@ -14,6 +14,7 @@ dist
 .DS_Store
 Thumbs.db
 
+
 # IDE
 .vscode
 .idea
@@ -24,3 +25,6 @@ coverage
 # Project Specific
 docs/
 .planning/
+
+
+08-SUMMARY.MD
