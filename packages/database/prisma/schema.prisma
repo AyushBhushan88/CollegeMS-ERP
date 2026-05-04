@@ -18,7 +18,7 @@ enum UserRole {
   HR_STAFF
   LIBRARIAN
   HOSTEL_WARDEN
-  PLACEMENT_OFFER
+  PLACEMENT_OFFICER
   EXAM_CONTROLLER
 }
 
@@ -89,6 +89,48 @@ enum ExamType {
   VIVA
 }
 
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  RESIGNED
+  TERMINATED
+}
+
+enum LeaveType {
+  CASUAL
+  SICK
+  EARNED
+  MATERNITY
+  PATERNITY
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum BookStatus {
+  AVAILABLE
+  ISSUED
+  RESERVED
+  LOST
+  DAMAGED
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum PlacementStatus {
+  PENDING
+  OFFERED
+  REJECTED
+}
+
 model User {
   id               String   @id @default(uuid())
   email            String   @unique
@@ -106,6 +148,7 @@ model User {
   updatedAt        DateTime @updatedAt
 
   student          Student?
+  employeeProfile  EmployeeProfile?
   applications     AdmissionApplication[]
   documents        Document[]
   timetableSlots    TimetableSlot[] @relation("FacultySlots")
@@ -179,10 +222,14 @@ model Student {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 
-  transactions      Transaction[]
-  attendance        AttendanceRecord[]
-  marks             MarksEntry[]
-  transcripts       Transcript[]
+  transactions          Transaction[]
+  attendance            AttendanceRecord[]
+  marks                 MarksEntry[]
+  transcripts           Transcript[]
+  libraryIssues         IssueRecord[]
+  roomAllocation        RoomAllocation?
+  transportAllocation   TransportAllocation?
+  placementApplications PlacementApplication[]
 }
 
 model AdmissionApplication {
@@ -435,4 +482,222 @@ model SubjectCOPO {
   updatedAt        DateTime       @updatedAt
 
   @@unique([courseOutcomeId, programOutcomeId])
+}
+
+enum HostelType {
+  BOYS
+  GIRLS
+}
+
+enum RoomType {
+  SINGLE
+  DOUBLE
+  TRIPLE
+}
+
+model EmployeeProfile {
+  id               String         @id @default(uuid())
+  userId           String         @unique
+  user             User           @relation(fields: [userId], references: [id])
+  employeeCode     String         @unique
+  designation      String
+  department       String
+  joiningDate      DateTime
+  salary           Decimal?       @db.Decimal(12, 2)
+  status           EmployeeStatus @default(ACTIVE)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  leaveRequests    LeaveRequest[]
+  leaveBalances    LeaveBalance[]
+  libraryIssues    IssueRecord[]
+  approvedLeaves   LeaveRequest[] @relation("ApprovedBy")
+}
+
+model LeaveRequest {
+  id            String      @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
+  leaveType     LeaveType
+  startDate     DateTime
+  endDate       DateTime
+  reason        String
+  status        LeaveStatus @default(PENDING)
+  approvedById  String?
+  approvedBy    EmployeeProfile? @relation("ApprovedBy", fields: [approvedById], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model LeaveBalance {
+  id            String          @id @default(uuid())
+  employeeId    String
+  employee      EmployeeProfile @relation(fields: [employeeId], references: [id])
+  leaveType     LeaveType
+  total         Int
+  used          Int             @default(0)
+  year          Int
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@unique([employeeId, leaveType, year])
+}
+
+model Book {
+  id          String    @id @default(uuid())
+  title       String
+  isbn        String    @unique
+  author      String
+  publisher   String
+  subject     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  copies      BookCopy[]
+}
+
+model BookCopy {
+  id              String     @id @default(uuid())
+  bookId          String
+  book            Book       @relation(fields: [bookId], references: [id])
+  accessionNumber String     @unique
+  status          BookStatus @default(AVAILABLE)
+  location        String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  issues          IssueRecord[]
+}
+
+model IssueRecord {
+  id            String    @id @default(uuid())
+  bookCopyId    String
+  bookCopy      BookCopy  @relation(fields: [bookCopyId], references: [id])
+  studentId     String?
+  student       Student?  @relation(fields: [studentId], references: [id])
+  employeeId    String?
+  employee      EmployeeProfile? @relation(fields: [employeeId], references: [id])
+  issueDate     DateTime  @default(now())
+  dueDate       DateTime
+  returnDate    DateTime?
+  fineAmount    Decimal   @default(0) @db.Decimal(10, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Hostel {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  type      HostelType
+  capacity  Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  rooms     Room[]
+}
+
+model Room {
+  id          String     @id @default(uuid())
+  hostelId    String
+  hostel      Hostel     @relation(fields: [hostelId], references: [id])
+  roomNumber  String
+  floor       Int
+  type        RoomType
+  capacity    Int
+  status      RoomStatus @default(AVAILABLE)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  allocations RoomAllocation[]
+
+  @@unique([hostelId, roomNumber])
+}
+
+model RoomAllocation {
+  id          String   @id @default(uuid())
+  studentId   String   @unique
+  student     Student  @relation(fields: [studentId], references: [id])
+  roomId      String
+  room        Room     @relation(fields: [roomId], references: [id])
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Vehicle {
+  id                 String   @id @default(uuid())
+  registrationNumber String   @unique
+  capacity           Int
+  driverName         String?
+  driverPhone        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  allocations        TransportAllocation[]
+}
+
+model Route {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  source      String
+  destination String
+  stops       Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  allocations TransportAllocation[]
+}
+
+model TransportAllocation {
+  id          String   @id @default(uuid())
+  studentId   String   @unique
+  student     Student  @relation(fields: [studentId], references: [id])
+  routeId     String
+  route       Route    @relation(fields: [routeId], references: [id])
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  pickupPoint String
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PlacementDrive {
+  id                  String   @id @default(uuid())
+  companyName         String
+  date                DateTime
+  eligibilityCriteria Json
+  packageDetails      String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  applications        PlacementApplication[]
+}
+
+model PlacementApplication {
+  id          String          @id @default(uuid())
+  driveId     String
+  drive       PlacementDrive  @relation(fields: [driveId], references: [id])
+  studentId   String
+  student     Student         @relation(fields: [studentId], references: [id])
+  status      PlacementStatus @default(PENDING)
+  resumeUrl   String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  result      PlacementResult?
+
+  @@unique([driveId, studentId])
+}
+
+model PlacementResult {
+  id              String               @id @default(uuid())
+  applicationId   String               @unique
+  application     PlacementApplication @relation(fields: [applicationId], references: [id])
+  offerLetterUrl  String?
+  packageOffered  Decimal?             @db.Decimal(12, 2)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 }
