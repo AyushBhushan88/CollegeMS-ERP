@@ -5,3 +5,8 @@ export * from './api.types.js';
 export * from './academic.types.js';
 export * from './attendance.types.js';
 export * from './examination.types.js';
+export * from './hr.types.js';
+export * from './library.types.js';
+export * from './hostel.types.js';
+export * from './transport.types.js';
+export * from './placement.types.js';
