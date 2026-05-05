@@ -5,11 +5,21 @@ import { prisma } from '@campuscore/database';
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private readonly _prisma = prisma;
 
-  get student() { return this._prisma.student; }
-  get user() { return this._prisma.user; }
-  get program() { return this._prisma.program; }
-  get branch() { return this._prisma.branch; }
-  get admissionApplication() { return this._prisma.admissionApplication; }
+  get student() {
+    return this._prisma.student;
+  }
+  get user() {
+    return this._prisma.user;
+  }
+  get program() {
+    return this._prisma.program;
+  }
+  get branch() {
+    return this._prisma.branch;
+  }
+  get admissionApplication() {
+    return this._prisma.admissionApplication;
+  }
   // Add other models as needed
 
   async onModuleInit() {

@@ -22,11 +22,16 @@ export class EventsService implements OnModuleInit, OnModuleDestroy {
       'admission.confirmed',
       'finance.admission_confirmed',
       async (data: any) => {
-        console.log('[EventsService] Received ADMISSION_CONFIRMED event:', data);
+        console.log(
+          '[EventsService] Received ADMISSION_CONFIRMED event:',
+          data,
+        );
         const { studentId } = data;
         if (studentId) {
           await this.financeService.generateFeesForStudent(studentId);
-          console.log(`[EventsService] Fees generated for student: ${studentId}`);
+          console.log(
+            `[EventsService] Fees generated for student: ${studentId}`,
+          );
         }
       },
     );

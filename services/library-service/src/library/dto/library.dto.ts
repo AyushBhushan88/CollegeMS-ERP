@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsDateString, IsUUID } from 'class-validator';
 
 export class CreateBookDto {
   @IsString()
@@ -12,24 +12,45 @@ export class CreateBookDto {
   @IsString()
   @IsNotEmpty()
   isbn: string;
+
+  @IsString()
+  @IsNotEmpty()
+  publisher: string;
+
+  @IsString()
+  @IsNotEmpty()
+  subject: string;
 }
 
-export class UpdateBookDto {
-  @IsOptional()
+export class AddBookCopyDto {
   @IsString()
-  title?: string;
+  @IsNotEmpty()
+  accessionNumber: string;
 
-  @IsOptional()
   @IsString()
-  author?: string;
+  @IsOptional()
+  location?: string;
 }
 
 export class IssueBookDto {
   @IsString()
   @IsNotEmpty()
-  studentId: string;
+  accessionNumber: string;
 
+  @IsUUID()
+  @IsOptional()
+  studentId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  employeeId?: string;
+
+  @IsDateString()
+  dueDate: string;
+}
+
+export class ReturnBookDto {
   @IsString()
   @IsNotEmpty()
-  bookId: string;
+  accessionNumber: string;
 }

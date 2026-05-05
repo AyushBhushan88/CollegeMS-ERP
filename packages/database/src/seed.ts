@@ -1,5 +1,5 @@
 import { PrismaClient, UserRole, Category } from '@prisma/client';
-import * as crypto from 'crypto';
+import { hashPassword } from '@campuscore/shared-utils';
 
 const prisma = new PrismaClient();
 
@@ -61,12 +61,13 @@ async function main() {
   // 2. Create Super Admin
   console.log('Seeding super admin...');
   const superAdminEmail = 'admin@campuscore.edu';
-  // Use a simple SHA256 for seed. In production, this would be Argon2.
-  const passwordHash = crypto.createHash('sha256').update('Admin@123').digest('hex');
+  const passwordHash = await hashPassword('Admin@123');
 
-  await prisma.user.upsert({
+  const superAdmin = await prisma.user.upsert({
     where: { email: superAdminEmail },
-    update: {},
+    update: {
+      passwordHash: passwordHash,
+    },
     create: {
       email: superAdminEmail,
       passwordHash,
@@ -197,14 +198,11 @@ async function main() {
   // 7. Seed Operations Data (HR, Library, Hostel, Transport, Placement)
   console.log('Seeding operations data...');
 
-  const hrEmployee = await prisma.employeeProfile.upsert({
+  await prisma.employeeProfile.upsert({
     where: { employeeCode: 'EMP001' },
     update: {},
     create: {
-      userId: superAdminEmail, // linking to super admin for testing
-      user: {
-        connect: { email: superAdminEmail }
-      },
+      userId: superAdmin.id,
       employeeCode: 'EMP001',
       designation: 'Professor',
       department: 'CSE',
@@ -214,7 +212,7 @@ async function main() {
     }
   });
 
-  const book = await prisma.book.upsert({
+  await prisma.book.upsert({
     where: { isbn: '978-3-16-148410-0' },
     update: {},
     create: {
@@ -231,7 +229,7 @@ async function main() {
     }
   });
 
-  const hostel = await prisma.hostel.upsert({
+  await prisma.hostel.upsert({
     where: { name: 'Boys Hostel A' },
     update: {},
     create: {
@@ -246,7 +244,7 @@ async function main() {
     }
   });
 
-  const route = await prisma.route.upsert({
+  await prisma.route.upsert({
     where: { name: 'Route 1' },
     update: {},
     create: {
@@ -257,7 +255,7 @@ async function main() {
     }
   });
 
-  const placementDrive = await prisma.placementDrive.create({
+  await prisma.placementDrive.create({
     data: {
       companyName: 'Tech Corp',
       date: new Date('2025-01-01'),

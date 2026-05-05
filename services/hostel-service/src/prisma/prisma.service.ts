@@ -10,7 +10,9 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get program() { return this._prisma.program; }
   get branch() { return this._prisma.branch; }
   get admissionApplication() { return this._prisma.admissionApplication; }
-  // Add other models as needed
+  get hostel() { return this._prisma.hostel; }
+  get room() { return this._prisma.room; }
+  get roomAllocation() { return this._prisma.roomAllocation; }
 
   async onModuleInit() {
     // Connection is handled by the shared prisma client

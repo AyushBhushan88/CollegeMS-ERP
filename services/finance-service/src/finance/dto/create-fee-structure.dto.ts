@@ -1,4 +1,12 @@
-import { IsString, IsNumber, IsArray, IsDateString, IsOptional, ValidateNested, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsArray,
+  IsDateString,
+  IsOptional,
+  ValidateNested,
+  IsEnum,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { Category } from '@campuscore/shared-constants';
 

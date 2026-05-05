@@ -11,11 +11,12 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
     await prisma.$disconnect();
   }
 
-  get user() {
-    return prisma.user;
-  }
-
-  // Add other delegates as needed, or just expose prisma
+  get user() { return prisma.user; }
+  get student() { return prisma.student; }
+  get transcript() { return prisma.transcript; }
+  get placementDrive() { return prisma.placementDrive; }
+  get placementApplication() { return prisma.placementApplication; }
+  get placementResult() { return prisma.placementResult; }
   get client() {
     return prisma;
   }

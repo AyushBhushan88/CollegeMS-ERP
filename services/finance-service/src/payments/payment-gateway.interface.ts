@@ -7,5 +7,9 @@ export interface PaymentOrder {
 
 export interface IPaymentGateway {
   createOrder(amount: number, receipt: string): Promise<PaymentOrder>;
-  verifySignature(orderId: string, paymentId: string, signature: string): Promise<boolean>;
+  verifySignature(
+    orderId: string,
+    paymentId: string,
+    signature: string,
+  ): Promise<boolean>;
 }

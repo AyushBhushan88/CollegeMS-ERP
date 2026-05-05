@@ -1,6 +1,6 @@
-import { Controller, Post, Get, Body, Param, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseGuards, Request, Put, Query } from '@nestjs/common';
 import { AdmissionService } from './admission.service';
-import { SubmitApplicationDto } from './dto/submit-application.dto';
+import { SubmitApplicationDto, UpdateApplicationStatusDto } from './dto/submit-application.dto';
 
 @Controller('admission')
 export class AdmissionController {
@@ -8,9 +8,21 @@ export class AdmissionController {
 
   @Post('apply')
   async submitApplication(@Request() req: any, @Body() dto: SubmitApplicationDto) {
-    // In a real app, userId would come from JWT
-    const userId = req.user?.id || 'temp-user-id'; 
+    const userId = req.body.userId || req.user?.id; 
     return this.admissionService.submitApplication(userId, dto);
+  }
+
+  @Get('applications')
+  async getApplications(@Query('userId') userId?: string) {
+    if (userId) {
+      return this.admissionService.findUserApplications(userId);
+    }
+    return this.admissionService.findAllApplications();
+  }
+
+  @Put('applications/:id/status')
+  async updateStatus(@Param('id') id: string, @Body() dto: UpdateApplicationStatusDto) {
+    return this.admissionService.updateStatus(id, dto);
   }
 
   @Get('merit-list/:programId')

@@ -1,13 +1,54 @@
 'use client';
 
-import { BarChart3, PieChart, Download, FileText, TrendingUp } from 'lucide-react';
+import { BarChart3, PieChart, Download, FileText, TrendingUp, Loader2 } from 'lucide-react';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+import { reportService } from '@/services/report-service';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ReportsDashboard() {
+  const [summary, setSummary] = useState<any>(null);
+  const [academicData, setAcademicData] = useState<any>(null);
+  const [attendanceData, setAttendanceData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [sumData, acData, attData] = await Promise.all([
+          reportService.getExecutiveSummary(),
+          reportService.getAcademicPerformance(),
+          reportService.getAttendanceTrends(),
+        ]);
+        setSummary(sumData);
+        setAcademicData(acData);
+        setAttendanceData(attData);
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to fetch executive reports',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, [toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
-    <ProtectedRoute allowedRoles={['ADMIN', 'MANAGEMENT']}>
+    <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'COLLEGE_ADMIN', 'MANAGEMENT']}>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -15,11 +56,11 @@ export default function ReportsDashboard() {
             <p className="text-muted-foreground">Performance analytics and compliance documents</p>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" /> NAAC Report
+            <Button variant="outline" onClick={() => handleDownload('NAAC', 'PDF')} disabled={!!downloadingType}>
+              {downloadingType === 'NAAC-PDF' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />} NAAC Report
             </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" /> NIRF Data
+            <Button variant="outline" onClick={() => handleDownload('NIRF', 'EXCEL')} disabled={!!downloadingType}>
+              {downloadingType === 'NIRF-EXCEL' ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />} NIRF Data
             </Button>
           </div>
         </div>
@@ -27,24 +68,24 @@ export default function ReportsDashboard() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Students</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$2.4M</div>
-              <p className="text-xs text-green-600 flex items-center mt-1">
-                <TrendingUp className="h-3 w-3 mr-1" /> +12% from last quarter
-              </p>
+              <div className="text-2xl font-bold">{summary?.studentCount || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">Across all programs</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Admissions</CardTitle>
+              <CardTitle className="text-sm font-medium">Avg CGPA</CardTitle>
               <BarChart3 className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,245</div>
-              <p className="text-xs text-muted-foreground mt-1">For Fall 2024</p>
+              <div className="text-2xl font-bold">
+                {academicData?.averageCgpa?.toFixed(2) || 'N/A'}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Institutional average</p>
             </CardContent>
           </Card>
           <Card>
@@ -53,10 +94,22 @@ export default function ReportsDashboard() {
               <PieChart className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">88.5%</div>
+              <div className="text-2xl font-bold">
+                {summary?.placementPercentage?.toFixed(1) || 0}%
+              </div>
               <p className="text-xs text-green-600 flex items-center mt-1">
-                <TrendingUp className="h-3 w-3 mr-1" /> +2.5% from last year
+                <TrendingUp className="h-3 w-3 mr-1" /> {summary?.totalOffers || 0} offers generated
               </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Active Drives</CardTitle>
+              <TrendingUp className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary?.activeDrives || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">Open for application</p>
             </CardContent>
           </Card>
         </div>
@@ -65,13 +118,32 @@ export default function ReportsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Academic Performance</CardTitle>
-              <CardDescription>Average GPA across departments</CardDescription>
+              <CardDescription>Semester-wise SGPA Average</CardDescription>
             </CardHeader>
-            <CardContent className="h-[300px] flex items-center justify-center bg-gray-50 rounded-md border border-dashed m-6">
-              {/* Placeholder for actual chart component */}
-              <div className="flex flex-col items-center text-muted-foreground">
-                <BarChart3 className="h-10 w-10 mb-2 text-gray-400" />
-                <p>Bar Chart Visualization</p>
+            <CardContent>
+              <div className="space-y-4 pt-4">
+                {academicData?.semesterWise?.length > 0 ? (
+                  academicData.semesterWise.map((sem: any) => (
+                    <div key={sem.semester} className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Semester {sem.semester}</span>
+                      <div className="flex items-center space-x-4 flex-1 ml-8">
+                        <div className="h-2 bg-blue-100 rounded-full flex-1 overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600"
+                            style={{ width: `${(sem._avg.sgpa / 10) * 100}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm font-bold w-12 text-right">
+                          {sem._avg.sgpa.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-center text-muted-foreground py-8">
+                    No academic data available
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -84,12 +156,15 @@ export default function ReportsDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { name: 'Annual Quality Assurance Report (AQAR)', date: 'Generated Oct 01, 2024' },
-                  { name: 'Financial Audit Summary 2023-24', date: 'Generated Sep 15, 2024' },
+                  { name: 'Annual Quality Assurance Report (AQAR)', date: 'Oct 2024 Cycle' },
+                  { name: 'NAAC Self Study Report (SSR)', date: 'In Preparation' },
+                  { name: 'NIRF Data Capturing System', date: 'Fall 2024' },
                   { name: 'Faculty Workload Analysis', date: 'Generated Oct 05, 2024' },
-                  { name: 'Infrastructure & Resource Utilization', date: 'Generated Sep 28, 2024' },
                 ].map((doc, i) => (
-                  <div key={i} className="flex items-center justify-between border p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between border p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex items-center space-x-3">
                       <FileText className="h-5 w-5 text-blue-600" />
                       <div>

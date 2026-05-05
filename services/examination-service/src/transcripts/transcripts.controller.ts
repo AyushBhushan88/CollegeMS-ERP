@@ -5,12 +5,14 @@ import { TranscriptsService } from './transcripts.service';
 export class TranscriptsController {
   constructor(private readonly transcriptsService: TranscriptsService) {}
 
-  @Post('generate/:studentId/:semester')
-  async generateTranscript(
-    @Param('studentId') studentId: string,
-    @Param('semester') semester: string,
-  ) {
-    return this.transcriptsService.generateTranscript(studentId, parseInt(semester));
+  @Post('generate')
+  async generateTranscript(@Body() data: { studentId: string; semester: number }) {
+    return this.transcriptsService.generateTranscript(data.studentId, data.semester);
+  }
+
+  @Get('student/:studentId')
+  async getStudentTranscripts(@Param('studentId') studentId: string) {
+    return this.transcriptsService.getTranscriptsByStudent(studentId);
   }
 
   @Get(':studentId')

@@ -1,5 +1,5 @@
 {
-  "name": "auth-service",
+  "name": "placement-service",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@campuscore/database": "workspace:^",
+    "@campuscore/event-bus": "workspace:^",
     "@campuscore/shared-constants": "workspace:^",
     "@campuscore/shared-types": "workspace:^",
     "@campuscore/shared-utils": "workspace:^",

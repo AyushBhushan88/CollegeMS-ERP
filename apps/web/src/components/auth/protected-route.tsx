@@ -5,10 +5,10 @@ import { useEffect } from 'react';
 
 import { useAuth } from '@/hooks/use-auth';
 
-export function ProtectedRoute({ 
+export function ProtectedRoute({
   children,
-  allowedRoles
-}: { 
+  allowedRoles,
+}: {
   children: React.ReactNode;
   allowedRoles?: string[];
 }) {
@@ -18,7 +18,13 @@ export function ProtectedRoute({
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/auth/login');
-    } else if (!isLoading && isAuthenticated && allowedRoles && user?.role && !allowedRoles.includes(user.role)) {
+    } else if (
+      !isLoading &&
+      isAuthenticated &&
+      allowedRoles &&
+      user?.role &&
+      !allowedRoles.includes(user.role)
+    ) {
       router.push('/dashboard');
     }
   }, [isLoading, isAuthenticated, router, allowedRoles, user?.role]);

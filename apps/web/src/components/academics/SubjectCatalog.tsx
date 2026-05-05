@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import apiClient from '@/lib/api-client';
+import { academicService } from '@/services/academic-service';
 
 export function SubjectCatalog() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -31,8 +31,8 @@ export function SubjectCatalog() {
   const fetchSubjects = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get('/academic/subjects');
-      setSubjects(response.data);
+      const data = await academicService.getSubjects();
+      setSubjects(data);
     } catch (error) {
       console.error('Failed to fetch subjects:', error);
       toast({
@@ -52,7 +52,7 @@ export function SubjectCatalog() {
   const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiClient.post('/academic/subjects', newSubject);
+      await academicService.createSubject(newSubject);
       toast({
         title: 'Success',
         description: 'Subject added successfully',

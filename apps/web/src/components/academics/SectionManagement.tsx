@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import apiClient from '@/lib/api-client';
+import { academicService } from '@/services/academic-service';
 
 export function SectionManagement() {
   const [sections, setSections] = useState<Section[]>([]);
@@ -33,8 +33,8 @@ export function SectionManagement() {
   const fetchSections = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get('/academic/sections');
-      setSections(response.data);
+      const data = await academicService.getSections();
+      setSections(data);
     } catch (error) {
       console.error('Failed to fetch sections:', error);
       toast({
@@ -54,7 +54,7 @@ export function SectionManagement() {
   const handleAddSection = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiClient.post('/academic/sections', newSection);
+      await academicService.createSection(newSection);
       toast({
         title: 'Success',
         description: 'Section added successfully',

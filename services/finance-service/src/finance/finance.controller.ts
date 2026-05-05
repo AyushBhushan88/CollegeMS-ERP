@@ -16,7 +16,10 @@ export class FinanceController {
     @Query('programId') programId?: string,
     @Query('batchYear') batchYear?: string,
   ): Promise<any> {
-    return this.financeService.getFeeStructures(programId, batchYear ? parseInt(batchYear) : undefined);
+    return this.financeService.getFeeStructures(
+      programId,
+      batchYear ? parseInt(batchYear) : undefined,
+    );
   }
 
   @Post('generate-fees/:studentId')

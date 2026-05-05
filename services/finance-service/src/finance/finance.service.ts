@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFeeStructureDto } from './dto/create-fee-structure.dto';
 import { Category, TransactionStatus } from '@campuscore/shared-constants';
@@ -8,7 +12,17 @@ export class FinanceService {
   constructor(private prisma: PrismaService) {}
 
   async createFeeStructure(dto: CreateFeeStructureDto): Promise<any> {
-    const { programId, batchYear, category, academicYear, semester, feeHeads, dueDate, lateFeePerDay, installments } = dto;
+    const {
+      programId,
+      batchYear,
+      category,
+      academicYear,
+      semester,
+      feeHeads,
+      dueDate,
+      lateFeePerDay,
+      installments,
+    } = dto;
 
     // Calculate total amount
     const totalAmount = feeHeads.reduce((sum, head) => sum + head.amount, 0);

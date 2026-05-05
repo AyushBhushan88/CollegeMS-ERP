@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../event-bus/event-bus.service';
+import { ScheduleExamDto } from './dto/exam.dto';
 
 @Injectable()
 export class ExamsService {
@@ -9,22 +10,34 @@ export class ExamsService {
     private eventBus: EventBusService,
   ) {}
 
-  async scheduleExam(data: any) {
-    const { schedules, ...examData } = data;
+  async scheduleExam(dto: ScheduleExamDto) {
+    const { schedules, ...examData } = dto;
     
     const exam = await this.prisma.exam.create({
       data: {
         ...examData,
+        startDate: new Date(dto.startDate),
+        endDate: new Date(dto.endDate),
         schedules: {
-          create: schedules
+          create: schedules.map(s => ({
+            ...s,
+            date: new Date(s.date)
+          }))
         }
       },
       include: {
-        schedules: true
+        schedules: true,
+        branch: true
       }
     });
 
-    await this.eventBus.publish('examination', 'exam.scheduled', exam);
+    await this.eventBus.publish('examination.events', 'exam.scheduled', {
+      examId: exam.id,
+      name: exam.name,
+      startDate: exam.startDate,
+      branch: exam.branch.name,
+    });
+
     return exam;
   }
 

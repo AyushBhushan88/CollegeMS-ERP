@@ -28,47 +28,91 @@ export class EventsService implements OnModuleInit {
         },
       );
 
-      // Subscribe to APPLICATION_ACCEPTED
+      // Subscribe to LEAVE_STATUS_UPDATED
       await eventBus.subscribe(
-        'admissions',
-        'application.accepted',
-        'communication_application_accepted',
+        'hr.events',
+        'leave.status_updated',
+        'communication_leave_status_updated',
         async (data) => {
-          this.logger.log(`Received application.accepted event: ${JSON.stringify(data)}`);
-          await this.notificationsService.notifyApplicationAccepted(data);
+          this.logger.log(`Received leave.status_updated event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyLeaveStatusUpdate(data);
         },
       );
 
-      // Subscribe to LEAVE_APPROVED
+      // Subscribe to BOOK_ISSUED
       await eventBus.subscribe(
-        'hr',
-        'leave.approved',
-        'communication_leave_approved',
+        'library.events',
+        'book.issued',
+        'communication_book_issued',
         async (data) => {
-          this.logger.log(`Received leave.approved event: ${JSON.stringify(data)}`);
-          await this.notificationsService.notifyLeaveApproved(data);
+          this.logger.log(`Received book.issued event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyBookIssued(data);
         },
       );
 
-      // Subscribe to BOOK_OVERDUE
+      // Subscribe to BOOK_RETURNED
       await eventBus.subscribe(
-        'library',
-        'book.overdue',
-        'communication_book_overdue',
+        'library.events',
+        'book.returned',
+        'communication_book_returned',
         async (data) => {
-          this.logger.log(`Received book.overdue event: ${JSON.stringify(data)}`);
-          await this.notificationsService.notifyBookOverdue(data);
+          this.logger.log(`Received book.returned event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyBookReturned(data);
         },
       );
 
       // Subscribe to ROOM_ALLOCATED
       await eventBus.subscribe(
-        'hostel',
+        'hostel.events',
         'room.allocated',
         'communication_room_allocated',
         async (data) => {
           this.logger.log(`Received room.allocated event: ${JSON.stringify(data)}`);
           await this.notificationsService.notifyRoomAllocated(data);
+        },
+      );
+
+      // Subscribe to PLACEMENT_STATUS_UPDATED
+      await eventBus.subscribe(
+        'placement.events',
+        'application.status_updated',
+        'communication_placement_status_updated',
+        async (data) => {
+          this.logger.log(`Received application.status_updated event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyPlacementStatusUpdate(data);
+        },
+      );
+
+      // Subscribe to PLACEMENT_OFFERED
+      await eventBus.subscribe(
+        'placement.events',
+        'placement.offered',
+        'communication_placement_offered',
+        async (data) => {
+          this.logger.log(`Received placement.offered event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyPlacementOffered(data);
+        },
+      );
+
+      // Subscribe to EXAM_SCHEDULED
+      await eventBus.subscribe(
+        'examination.events',
+        'exam.scheduled',
+        'communication_exam_scheduled',
+        async (data) => {
+          this.logger.log(`Received exam.scheduled event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyExamScheduled(data);
+        },
+      );
+
+      // Subscribe to MARKS_ENTERED
+      await eventBus.subscribe(
+        'examination.events',
+        'marks.entered',
+        'communication_marks_entered',
+        async (data) => {
+          this.logger.log(`Received marks.entered event: ${JSON.stringify(data)}`);
+          await this.notificationsService.notifyMarksEntered(data);
         },
       );
 

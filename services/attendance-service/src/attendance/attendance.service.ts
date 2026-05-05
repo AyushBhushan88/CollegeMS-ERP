@@ -65,12 +65,14 @@ export class AttendanceService {
         ...(studentId && { studentId }),
         ...(subjectId && { subjectId }),
         ...(sectionId && { sectionId }),
-        ...(startDate || endDate ? {
-          date: {
-            ...(startDate && { gte: new Date(startDate) }),
-            ...(endDate && { lte: new Date(endDate) }),
-          },
-        } : {}),
+        ...(startDate || endDate
+          ? {
+              date: {
+                ...(startDate && { gte: new Date(startDate) }),
+                ...(endDate && { lte: new Date(endDate) }),
+              },
+            }
+          : {}),
       },
       include: {
         student: {
@@ -115,8 +117,10 @@ export class AttendanceService {
     const stats = await this.getStudentStats(studentId, subjectId);
 
     if (stats.percentage < 75) {
-      this.logger.warn(`Attendance shortage detected for student ${studentId} in subject ${subjectId}: ${stats.percentage.toFixed(2)}%`);
-      
+      this.logger.warn(
+        `Attendance shortage detected for student ${studentId} in subject ${subjectId}: ${stats.percentage.toFixed(2)}%`,
+      );
+
       await this.eventBus.publish('attendance.events', 'attendance.shortage', {
         studentId,
         subjectId,

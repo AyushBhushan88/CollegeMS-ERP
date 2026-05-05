@@ -7,7 +7,8 @@ export class EventBusService implements OnModuleInit, OnModuleDestroy {
   private eventBus: EventBus;
 
   constructor(private configService: ConfigService) {
-    const rabbitUrl = this.configService.get<string>('RABBITMQ_URL') || 'amqp://localhost';
+    const rabbitUrl =
+      this.configService.get<string>('RABBITMQ_URL') || 'amqp://localhost';
     this.eventBus = new EventBus(rabbitUrl);
   }
 
@@ -19,7 +20,11 @@ export class EventBusService implements OnModuleInit, OnModuleDestroy {
     await this.eventBus.close();
   }
 
-  async publish<T = any>(exchange: string, routingKey: string, message: T): Promise<void> {
+  async publish<T = any>(
+    exchange: string,
+    routingKey: string,
+    message: T,
+  ): Promise<void> {
     await this.eventBus.publish(exchange, routingKey, message);
   }
 

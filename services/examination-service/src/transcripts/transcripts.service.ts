@@ -41,7 +41,19 @@ export class TranscriptsService {
 
     const sgpa = totalPoints / totalCredits;
 
-    // 3. Upsert Transcript
+    // 3. Calculate CGPA (Average of all finalized SGPA including this one)
+    const previousTranscripts = await this.prisma.transcript.findMany({
+      where: {
+        studentId,
+        semester: { lt: semester },
+        isFinalized: true,
+      },
+    });
+
+    const allSgpas = [...previousTranscripts.map(t => t.sgpa), sgpa];
+    const cgpa = allSgpas.reduce((a, b) => a + b, 0) / allSgpas.length;
+
+    // 4. Upsert Transcript
     const transcript = await this.prisma.transcript.upsert({
       where: {
         studentId_semester: {
@@ -51,8 +63,9 @@ export class TranscriptsService {
       },
       update: {
         sgpa,
+        cgpa,
         totalCredits,
-        earnedCredits: totalCredits, // Assume all earned for now
+        earnedCredits: totalCredits,
         resultStatus: sgpa >= 4 ? 'PASS' : 'FAIL',
         isFinalized: true,
       },
@@ -60,12 +73,15 @@ export class TranscriptsService {
         studentId,
         semester,
         sgpa,
-        cgpa: sgpa, // Should calculate based on previous semesters
+        cgpa,
         totalCredits,
         earnedCredits: totalCredits,
         resultStatus: sgpa >= 4 ? 'PASS' : 'FAIL',
         isFinalized: true,
       },
+      include: {
+        student: { include: { user: true } }
+      }
     });
 
     return transcript;

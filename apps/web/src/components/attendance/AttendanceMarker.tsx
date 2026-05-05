@@ -17,7 +17,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import apiClient from '@/lib/api-client';
+import { academicService } from '@/services/academic-service';
+import { attendanceService } from '@/services/attendance-service';
+import { studentService } from '@/services/student-service';
 
 export function AttendanceMarker() {
   const [sections, setSections] = useState<Section[]>([]);
@@ -45,8 +47,8 @@ export function AttendanceMarker() {
 
   const fetchSections = async () => {
     try {
-      const response = await apiClient.get('/academic/sections');
-      setSections(response.data);
+      const data = await academicService.getSections();
+      setSections(data);
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load sections', variant: 'destructive' });
     }
@@ -54,8 +56,8 @@ export function AttendanceMarker() {
 
   const fetchSubjects = async () => {
     try {
-      const response = await apiClient.get('/academic/subjects');
-      setSubjects(response.data);
+      const data = await academicService.getSubjects();
+      setSubjects(data);
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load subjects', variant: 'destructive' });
     }
@@ -64,13 +66,12 @@ export function AttendanceMarker() {
   const fetchStudents = async (sectionId: string) => {
     try {
       setIsLoading(true);
-      // Assuming students can be fetched by sectionId from academic or student service
-      const response = await apiClient.get(`/student/section/${sectionId}`);
-      setStudents(response.data);
+      const data = await studentService.getStudentsBySection(sectionId);
+      setStudents(data);
 
       // Initialize all as Present
       const initialAttendance: Record<string, AttendanceStatus> = {};
-      response.data.forEach((student: Student) => {
+      data.forEach((student: Student) => {
         initialAttendance[student.id] = AttendanceStatus.PRESENT;
       });
       setAttendance(initialAttendance);
@@ -111,7 +112,7 @@ export function AttendanceMarker() {
         status: attendance[student.id],
       }));
 
-      await apiClient.post('/attendance/bulk', { records });
+      await attendanceService.submitBulkAttendance(records);
       toast({ title: 'Success', description: 'Attendance marked successfully' });
     } catch (error: any) {
       toast({

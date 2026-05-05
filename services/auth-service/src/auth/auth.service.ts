@@ -1,7 +1,15 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { prisma } from '@campuscore/database';
-import { hashPassword, verifyPassword, generateToken } from '@campuscore/shared-utils';
+import {
+  hashPassword,
+  verifyPassword,
+  generateToken,
+} from '@campuscore/shared-utils';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { VerifyMfaDto } from './dto/verify-mfa.dto';
@@ -48,7 +56,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await verifyPassword(loginDto.password, user.passwordHash);
+    const isPasswordValid = await verifyPassword(
+      loginDto.password,
+      user.passwordHash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');

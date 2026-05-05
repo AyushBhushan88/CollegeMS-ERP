@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EventBusService } from '../event-bus/event-bus.service';
+import { CreateMarksEntryDto, BulkMarksEntryDto } from '../exams/dto/exam.dto';
 
 @Injectable()
 export class MarksService {
@@ -9,30 +10,47 @@ export class MarksService {
     private eventBus: EventBusService,
   ) {}
 
-  async enterMarks(data: any) {
+  async enterMarks(dto: CreateMarksEntryDto) {
     const marks = await this.prisma.marksEntry.upsert({
       where: {
         examId_subjectId_studentId: {
-          examId: data.examId,
-          subjectId: data.subjectId,
-          studentId: data.studentId,
+          examId: dto.examId,
+          subjectId: dto.subjectId,
+          studentId: dto.studentId,
         },
       },
       update: {
-        marksObtained: data.marksObtained,
-        isAbsent: data.isAbsent,
-        remarks: data.remarks,
+        marksObtained: dto.marksObtained,
+        isAbsent: dto.isAbsent || false,
+        remarks: dto.remarks,
       },
-      create: data,
+      create: {
+        ...dto,
+        isAbsent: dto.isAbsent || false,
+      },
+      include: {
+        student: { include: { user: true } },
+        subject: true,
+        exam: true,
+      },
     });
 
-    await this.eventBus.publish('examination', 'marks.entered', marks);
+    await this.eventBus.publish('examination.events', 'marks.entered', {
+      studentId: marks.studentId,
+      studentName: `${marks.student.user.firstName} ${marks.student.user.lastName}`,
+      studentEmail: marks.student.user.email,
+      subjectName: marks.subject.name,
+      examName: marks.exam.name,
+      marksObtained: marks.marksObtained,
+      totalMarks: marks.exam.totalMarks,
+    });
+
     return marks;
   }
 
-  async bulkEnterMarks(data: any[]) {
+  async bulkEnterMarks(dto: BulkMarksEntryDto) {
     const results = await Promise.all(
-      data.map((entry) => this.enterMarks(entry))
+      dto.entries.map((entry) => this.enterMarks(entry))
     );
     return results;
   }

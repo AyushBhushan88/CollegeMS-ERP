@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import apiClient from '@/lib/api-client';
+import { attendanceService } from '@/services/attendance-service';
 
 export function StudentAttendanceView() {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
@@ -28,12 +28,12 @@ export function StudentAttendanceView() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [recordsRes, statsRes] = await Promise.all([
-        apiClient.get(`/attendance/student/${user?.id}`),
-        apiClient.get(`/attendance/stats/${user?.id}`),
+      const [recordsData, statsData] = await Promise.all([
+        attendanceService.getStudentAttendance(user?.id!),
+        attendanceService.getStudentStats(user?.id!),
       ]);
-      setRecords(recordsRes.data);
-      setStats(statsRes.data);
+      setRecords(recordsData);
+      setStats(statsData);
     } catch (error) {
       toast({
         title: 'Error',

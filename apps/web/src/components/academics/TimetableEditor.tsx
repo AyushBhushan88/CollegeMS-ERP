@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import apiClient from '@/lib/api-client';
+import { academicService } from '@/services/academic-service';
 
 const DAYS = [
   DayOfWeek.MONDAY,
@@ -76,10 +76,10 @@ export function TimetableEditor() {
 
   const fetchSections = async () => {
     try {
-      const response = await apiClient.get('/academic/sections');
-      setSections(response.data);
-      if (response.data.length > 0 && !selectedSectionId) {
-        setSelectedSectionId(response.data[0].id);
+      const data = await academicService.getSections();
+      setSections(data);
+      if (data.length > 0 && !selectedSectionId) {
+        setSelectedSectionId(data[0].id);
       }
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load sections', variant: 'destructive' });
@@ -88,8 +88,8 @@ export function TimetableEditor() {
 
   const fetchSubjects = async () => {
     try {
-      const response = await apiClient.get('/academic/subjects');
-      setSubjects(response.data);
+      const data = await academicService.getSubjects();
+      setSubjects(data);
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load subjects', variant: 'destructive' });
     }
@@ -98,8 +98,8 @@ export function TimetableEditor() {
   const fetchTimetable = async (sectionId: string) => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get(`/academic/timetable/section/${sectionId}`);
-      setSlots(response.data);
+      const data = await academicService.getTimetableBySection(sectionId);
+      setSlots(data);
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to load timetable', variant: 'destructive' });
     } finally {
@@ -110,7 +110,7 @@ export function TimetableEditor() {
   const handleAddSlot = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiClient.post('/academic/timetable', {
+      await academicService.createTimetableSlot({
         ...newSlot,
         sectionId: selectedSectionId,
       });

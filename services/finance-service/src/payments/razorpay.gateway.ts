@@ -13,8 +13,10 @@ export class RazorpayGateway implements IPaymentGateway {
   }
 
   async createOrder(amount: number, receipt: string): Promise<PaymentOrder> {
-    console.log(`[Razorpay] Creating order for amount: ${amount}, receipt: ${receipt}`);
-    
+    console.log(
+      `[Razorpay] Creating order for amount: ${amount}, receipt: ${receipt}`,
+    );
+
     // Skeleton implementation
     // In a real scenario, you would use 'razorpay' npm package here
     /*
@@ -40,9 +42,15 @@ export class RazorpayGateway implements IPaymentGateway {
     };
   }
 
-  async verifySignature(orderId: string, paymentId: string, signature: string): Promise<boolean> {
-    console.log(`[Razorpay] Verifying signature for order: ${orderId}, payment: ${paymentId}`);
-    
+  async verifySignature(
+    orderId: string,
+    paymentId: string,
+    signature: string,
+  ): Promise<boolean> {
+    console.log(
+      `[Razorpay] Verifying signature for order: ${orderId}, payment: ${paymentId}`,
+    );
+
     // Skeleton implementation
     /*
     const generated_signature = crypto
@@ -51,7 +59,7 @@ export class RazorpayGateway implements IPaymentGateway {
       .digest('hex');
     return generated_signature === signature;
     */
-    
+
     return true;
   }
 }

@@ -2,11 +2,20 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AttendanceStatus, TransactionStatus } from '@campuscore/database';
 
+export interface AttendanceResult {
+  subjectId: string;
+  subjectName: string;
+  percentage: number;
+  eligible: boolean;
+  totalClasses: number;
+  attendedClasses: number;
+}
+
 @Injectable()
 export class HallTicketService {
   constructor(private prisma: PrismaService) {}
 
-  async checkEligibility(studentId: string, semester: number) {
+  async checkEligibility(studentId: string, semester: number): Promise<any> {
     const student = await this.prisma.student.findUnique({
       where: { id: studentId },
     });
@@ -27,7 +36,7 @@ export class HallTicketService {
       throw new BadRequestException(`No subjects found for semester ${semester}`);
     }
 
-    const attendanceResults = [];
+    const attendanceResults: AttendanceResult[] = [];
     for (const subject of subjects) {
       const records = await this.prisma.attendanceRecord.findMany({
         where: {
@@ -79,7 +88,7 @@ export class HallTicketService {
     });
 
     let isFeesEligible = false;
-    let feeDetails = null;
+    let feeDetails: any = null;
 
     if (!feeStructure) {
       // If no fee structure defined, we might want to assume eligible or handle as error

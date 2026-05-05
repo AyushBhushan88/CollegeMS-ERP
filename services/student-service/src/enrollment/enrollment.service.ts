@@ -12,7 +12,7 @@ export class EnrollmentService {
   async enrollStudent(studentId: string, enrollmentData: any) {
     // Skeleton implementation
     console.log(`Enrolling student ${studentId} with data:`, enrollmentData);
-    
+
     // In a real implementation, this would update student status or create enrollment records
     // For now, just return a mock response
     const mockEnrollment = {
@@ -22,7 +22,11 @@ export class EnrollmentService {
       ...enrollmentData,
     };
 
-    await this.eventBus.publish('student.events', 'student.enrolled', mockEnrollment);
+    await this.eventBus.publish(
+      'student.events',
+      'student.enrolled',
+      mockEnrollment,
+    );
 
     return mockEnrollment;
   }

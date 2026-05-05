@@ -5,12 +5,7 @@ import { EmailDispatcher } from './dispatchers/email.dispatcher';
 import { SmsDispatcher } from './dispatchers/sms.dispatcher';
 
 @Module({
-  providers: [
-    NotificationsService,
-    NotificationsGateway,
-    EmailDispatcher,
-    SmsDispatcher,
-  ],
+  providers: [NotificationsService, NotificationsGateway, EmailDispatcher, SmsDispatcher],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}

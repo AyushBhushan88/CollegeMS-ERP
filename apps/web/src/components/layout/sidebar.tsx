@@ -7,6 +7,12 @@ import {
   BookOpen,
   ClipboardCheck,
   FileSignature,
+  Users,
+  Library,
+  Building,
+  Bus,
+  Briefcase,
+  BarChart3,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -19,6 +25,12 @@ const sidebarItems = [
   { name: 'Academics', href: '/dashboard/academics', icon: BookOpen },
   { name: 'Attendance', href: '/dashboard/attendance', icon: ClipboardCheck },
   { name: 'Exams', href: '/dashboard/exams', icon: FileSignature },
+  { name: 'HR', href: '/dashboard/hr', icon: Users },
+  { name: 'Library', href: '/dashboard/library', icon: Library },
+  { name: 'Hostel', href: '/dashboard/hostel', icon: Building },
+  { name: 'Transport', href: '/dashboard/transport', icon: Bus },
+  { name: 'Placement', href: '/dashboard/placement', icon: Briefcase },
+  { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
   { name: 'Applications', href: '/dashboard/applications', icon: FileText },
   { name: 'Profile', href: '/dashboard/profile', icon: User },
   { name: 'Payments', href: '/dashboard/payments', icon: CreditCard },
