@@ -264,6 +264,90 @@ async function main() {
     }
   });
 
+  // 8. Seed Enhancement Data (Grievance, Alumni)
+  console.log('Seeding enhancement data...');
+
+  const acadCategory = await prisma.grievanceCategory.upsert({
+    where: { name: 'Academic' },
+    update: {},
+    create: {
+      name: 'Academic',
+      description: 'Grievances related to classes, curriculum, or faculty'
+    }
+  });
+
+  await prisma.grievanceCategory.upsert({
+    where: { name: 'Infrastructure' },
+    update: {},
+    create: {
+      name: 'Infrastructure',
+      description: 'Grievances related to campus facilities'
+    }
+  });
+
+  await prisma.grievanceCommittee.upsert({
+    where: { name: 'Academic Committee' },
+    update: {},
+    create: {
+      name: 'Academic Committee',
+      members: [superAdmin.id],
+      categories: {
+        connect: [{ id: acadCategory.id }]
+      }
+    }
+  });
+
+  // Alumni Seed
+  console.log('Seeding alumni data...');
+  const alumniUserEmail = 'alumni@campuscore.edu';
+  const alumniUser = await prisma.user.upsert({
+    where: { email: alumniUserEmail },
+    update: {},
+    create: {
+      email: alumniUserEmail,
+      passwordHash,
+      firstName: 'Jane',
+      lastName: 'Doe',
+      role: UserRole.STUDENT, // Alumni are former students
+      isEmailVerified: true,
+    },
+  });
+
+  const alumniStudent = await prisma.student.upsert({
+    where: { enrollmentNumber: 'ALUM001' },
+    update: {},
+    create: {
+      userId: alumniUser.id,
+      enrollmentNumber: 'ALUM001',
+      programId: btech.id,
+      branchId: cseBranch.id,
+      batchYear: 2020,
+      currentSemester: 8,
+      admissionDate: new Date('2020-08-01'),
+      category: Category.GENERAL,
+      dateOfBirth: new Date('2002-01-01'),
+      gender: 'FEMALE',
+      guardianName: 'John Doe',
+      guardianPhone: '1234567890',
+      guardianRelation: 'Father',
+      permanentAddress: { street: '123 Alumni St', city: 'Grad City' },
+      correspondenceAddress: { street: '123 Alumni St', city: 'Grad City' },
+      status: 'GRADUATED',
+    },
+  });
+
+  await prisma.alumniProfile.upsert({
+    where: { studentId: alumniStudent.id },
+    update: {},
+    create: {
+      studentId: alumniStudent.id,
+      graduationYear: 2024,
+      currentCompany: 'Google',
+      designation: 'Software Engineer',
+      status: 'VERIFIED',
+    },
+  });
+
   console.log('Seeding completed successfully.');
 }
 
