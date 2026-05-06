@@ -131,6 +131,36 @@ enum PlacementStatus {
   REJECTED
 }
 
+enum GrievanceStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+  REOPENED
+  ESCALATED
+}
+
+enum GrievancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum AlumniStatus {
+  UNVERIFIED
+  VERIFIED
+  ACTIVE
+  INACTIVE
+}
+
+enum MentorshipStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
 model User {
   id               String   @id @default(uuid())
   email            String   @unique
@@ -230,6 +260,7 @@ model Student {
   roomAllocation        RoomAllocation?
   transportAllocation   TransportAllocation?
   placementApplications PlacementApplication[]
+  alumniProfile         AlumniProfile?
 }
 
 model AdmissionApplication {
@@ -700,4 +731,124 @@ model PlacementResult {
   packageOffered  Decimal?             @db.Decimal(12, 2)
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
+}
+
+model GrievanceCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  committees  GrievanceCommittee[]
+  grievances  Grievance[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model GrievanceCommittee {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  members     Json     // Array of User IDs
+  categories  GrievanceCategory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Grievance {
+  id            String           @id @default(uuid())
+  ticketNumber  String           @unique
+  complainantId String           // User ID
+  categoryId    String
+  category      GrievanceCategory @relation(fields: [categoryId], references: [id])
+  subject       String
+  description   String
+  priority      GrievancePriority @default(MEDIUM)
+  status        GrievanceStatus   @default(PENDING)
+  attachments   Json?            // Array of URLs
+  isAnonymous   Boolean           @default(false)
+  assignedToId  String?          // Committee ID
+  resolvedById  String?          // User ID
+  resolution    String?
+  resolvedAt    DateTime?
+  slaDeadline   DateTime
+  comments      GrievanceComment[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model GrievanceComment {
+  id          String    @id @default(uuid())
+  grievanceId String
+  grievance   Grievance @relation(fields: [grievanceId], references: [id])
+  userId      String
+  comment     String
+  attachments Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AlumniProfile {
+  id              String       @id @default(uuid())
+  studentId       String       @unique
+  student         Student      @relation(fields: [studentId], references: [id])
+  graduationYear  Int
+  currentCompany  String?
+  designation     String?
+  industry        String?
+  location        String?
+  linkedInUrl     String?
+  status          AlumniStatus @default(UNVERIFIED)
+  mentorshipApps  MentorshipApplication[]
+  donations       Donation[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model AlumniEvent {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  type        String   // e.g., "REUNION", "WEBINAR"
+  capacity    Int
+  registrations Json   // Array of User IDs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MentorshipProgram {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  mentorId    String   // User ID (Alumni)
+  startDate   DateTime
+  endDate     DateTime
+  capacity    Int
+  applications MentorshipApplication[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MentorshipApplication {
+  id          String            @id @default(uuid())
+  programId   String
+  program     MentorshipProgram @relation(fields: [programId], references: [id])
+  alumniId    String
+  alumni      AlumniProfile     @relation(fields: [alumniId], references: [id])
+  status      MentorshipStatus  @default(PENDING)
+  statement   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model Donation {
+  id              String        @id @default(uuid())
+  alumniId        String
+  alumni          AlumniProfile @relation(fields: [alumniId], references: [id])
+  amount          Decimal       @db.Decimal(12, 2)
+  purpose         String?
+  transactionId   String        @unique
+  paymentMethod   String
+  date            DateTime      @default(now())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
