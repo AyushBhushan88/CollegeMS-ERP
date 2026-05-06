@@ -10,3 +10,5 @@ export * from './library.types.js';
 export * from './hostel.types.js';
 export * from './transport.types.js';
 export * from './placement.types.js';
+export * from './grievance.types.js';
+export * from './alumni.types.js';
