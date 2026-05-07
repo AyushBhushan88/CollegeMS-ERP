@@ -59,10 +59,17 @@ export class AlumniService implements OnModuleInit {
     });
   }
 
+  async updatePrivacySettings(id: string, settings: any) {
+    return this.prisma.alumniProfile.update({
+      where: { id },
+      data: { privacySettings: settings }
+    });
+  }
+
   async findDirectory(filters: { batch?: number, industry?: string, department?: string }) {
-    return this.prisma.alumniProfile.findMany({
+    const profiles = await this.prisma.alumniProfile.findMany({
       where: {
-        graduationYear: filters.batch,
+        graduationYear: filters.batch ? Number(filters.batch) : undefined,
         industry: filters.industry,
         student: filters.department ? {
           branch: { name: filters.department }
@@ -72,11 +79,37 @@ export class AlumniService implements OnModuleInit {
       include: {
         student: {
           include: {
-            user: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                phone: true,
+              }
+            },
             branch: true,
           }
         }
       }
+    });
+
+    return profiles.map(profile => {
+      const settings = (profile.privacySettings as any) || {};
+      
+      return {
+        ...profile,
+        student: {
+          ...profile.student,
+          user: {
+            ...profile.student.user,
+            email: settings.hideEmail ? null : profile.student.user.email,
+            phone: settings.hidePhone ? null : profile.student.user.phone,
+          }
+        },
+        currentCompany: settings.hideCompany ? null : profile.currentCompany,
+        location: settings.hideLocation ? null : profile.location,
+        linkedInUrl: settings.hideLinkedIn ? null : profile.linkedInUrl,
+      };
     });
   }
 

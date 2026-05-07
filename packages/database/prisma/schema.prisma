@@ -796,6 +796,7 @@ model AlumniProfile {
   location        String?
   linkedInUrl     String?
   status          AlumniStatus @default(UNVERIFIED)
+  privacySettings Json?
   mentorshipApps  MentorshipApplication[]
   donations       Donation[]
   createdAt       DateTime     @default(now())
