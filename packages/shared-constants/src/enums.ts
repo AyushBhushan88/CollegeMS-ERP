@@ -168,3 +168,11 @@ export enum MentorshipStatus {
   REJECTED = 'REJECTED',
   COMPLETED = 'COMPLETED',
 }
+
+export enum DonationStatus {
+  INITIATED = 'INITIATED',
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+}
+

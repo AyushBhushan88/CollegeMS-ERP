@@ -840,6 +840,13 @@ model MentorshipApplication {
   updatedAt   DateTime          @updatedAt
 }
 
+enum DonationStatus {
+  INITIATED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
 model Donation {
   id              String        @id @default(uuid())
   alumniId        String
@@ -848,6 +855,7 @@ model Donation {
   purpose         String?
   transactionId   String        @unique
   paymentMethod   String
+  status          DonationStatus @default(INITIATED)
   date            DateTime      @default(now())
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
