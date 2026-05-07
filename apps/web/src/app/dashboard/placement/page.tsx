@@ -23,7 +23,40 @@ export default function PlacementDashboard() {
   const [drives, setDrives] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDrive, setSelectedDrive] = useState<any>(null);
+  const [resumeUrl, setResumeUrl] = useState('');
+  const [isApplying, setIsApplying] = useState(false);
   const { toast } = useToast();
+
+  const handleApply = async () => {
+    if (!resumeUrl) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Please provide a resume URL',
+      });
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      await placementService.applyForDrive({ driveId: selectedDrive.id, resumeUrl });
+      toast({
+        title: 'Success',
+        description: 'Application submitted successfully',
+      });
+      setSelectedDrive(null);
+      setResumeUrl('');
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to submit application',
+      });
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {

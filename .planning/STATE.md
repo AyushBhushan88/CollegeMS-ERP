@@ -27,10 +27,9 @@ progress:
 | 3: Operations  | Completed | 100%      |
 | 4: Enhancement | In Progress | 25%       |
 
-## Active Plans
-
-Current Plan: Phase 4 Plan 02
-Total Plans in Phase: 4
+Active Plans
+Current Plan: Phase 4 Plan 01
+Total Plans in Phase: 7
 
 ## Blockers
 
