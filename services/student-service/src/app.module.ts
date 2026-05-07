@@ -5,6 +5,7 @@ import { EventBusModule } from './event-bus/event-bus.module';
 import { StudentModule } from './student/student.module';
 import { EnrollmentModule } from './enrollment/enrollment.module';
 import { AcademicHistoryModule } from './academic-history/academic-history.module';
+import { GraduationModule } from './graduation/graduation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AcademicHistoryModule } from './academic-history/academic-history.modul
     StudentModule,
     EnrollmentModule,
     AcademicHistoryModule,
+    GraduationModule,
   ],
 })
 export class AppModule {}
