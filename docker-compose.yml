@@ -73,6 +73,18 @@ services:
       - "1025:1025"
       - "8025:8025"
 
+  mongodb:
+    image: mongo:6-jammy
+    container_name: campuscore-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: campuscore
+      MONGO_INITDB_ROOT_PASSWORD: campuscore_password
+      MONGO_INITDB_DATABASE: campuscore_analytics
+    volumes:
+      - mongodb_data:/data/db
+
   auth-service:
     build:
       context: .
@@ -101,6 +113,9 @@ services:
       - ADMISSION_SERVICE_URL=http://admission-service:3004
       - FINANCE_SERVICE_URL=http://finance-service:3003
       - COMMUNICATION_SERVICE_URL=http://communication-service:3006
+      - GRIEVANCE_SERVICE_URL=http://grievance-service:3015
+      - ALUMNI_SERVICE_URL=http://alumni-service:3016
+      - ANALYTICS_SERVICE_URL=http://analytics-service:3017
       - JWT_SECRET=supersecret
     depends_on:
       - auth-service
@@ -108,6 +123,9 @@ services:
       - admission-service
       - finance-service
       - communication-service
+      - grievance-service
+      - alumni-service
+      - analytics-service
 
   student-service:
     build:
@@ -174,9 +192,55 @@ services:
       - rabbitmq
       - mailhog
 
+  grievance-service:
+    build:
+      context: .
+      dockerfile: services/grievance-service/Dockerfile
+    container_name: campuscore-grievance-service
+    ports:
+      - "3015:3015"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3015
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  alumni-service:
+    build:
+      context: .
+      dockerfile: services/alumni-service/Dockerfile
+    container_name: campuscore-alumni-service
+    ports:
+      - "3016:3016"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3016
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: services/analytics-service/Dockerfile
+    container_name: campuscore-analytics-service
+    ports:
+      - "3017:3017"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3017
+    depends_on:
+      - postgres
+      - rabbitmq
+
 volumes:
   postgres_data:
   redis_data:
   rabbitmq_data:
   minio_data:
   elasticsearch_data:
+  mongodb_data:
