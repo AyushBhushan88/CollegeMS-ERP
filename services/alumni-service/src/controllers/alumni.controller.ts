@@ -6,7 +6,8 @@ import {
   Param,
   Patch,
   Query,
-  Req
+  Req,
+  UseGuards
 } from '@nestjs/common';
 import { AlumniService } from '../services/alumni.service';
 import { MentorshipService } from '../services/mentorship.service';
@@ -16,8 +17,10 @@ import {
   AlumniDirectoryFilterDto
 } from '../dtos/alumni.dto';
 import { DonationStatus } from '@campuscore/shared-constants';
+import { RbacGuard, Roles } from '../guards/rbac.guard';
 
 @Controller('alumni')
+@UseGuards(RbacGuard)
 export class AlumniController {
   constructor(
     private readonly alumniService: AlumniService,
@@ -31,6 +34,7 @@ export class AlumniController {
   }
 
   @Patch(':id/verify')
+  @Roles('admin')
   verify(@Param('id') id: string) {
     return this.alumniService.verifyProfile(id);
   }
@@ -46,6 +50,7 @@ export class AlumniController {
   }
 
   @Post('events')
+  @Roles('admin')
   createEvent(@Body() body: any) {
     return this.alumniService.createEvent(body);
   }
@@ -72,11 +77,13 @@ export class AlumniController {
   }
 
   @Patch('donations/:id/verify')
+  @Roles('admin')
   verifyDonation(@Param('id') id: string) {
     return this.donationService.verifyDonation(id);
   }
 
   @Patch('donations/:id/reject')
+  @Roles('admin')
   rejectDonation(@Param('id') id: string) {
     return this.donationService.rejectDonation(id);
   }
