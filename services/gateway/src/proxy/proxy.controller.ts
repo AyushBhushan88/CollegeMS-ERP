@@ -66,17 +66,23 @@ export class ProxyController {
       changeOrigin: true,
       pathRewrite: { '^/placement': '' },
     }),
-    transport: createProxyMiddleware({
-      target: process.env.TRANSPORT_SERVICE_URL || 'http://localhost:3013',
-      changeOrigin: true,
-      pathRewrite: { '^/transport': '' },
-    }),
     report: createProxyMiddleware({
       target: process.env.REPORT_SERVICE_URL || 'http://localhost:3014',
       changeOrigin: true,
       pathRewrite: { '^/report': '' },
     }),
-  };
+    alumni: createProxyMiddleware({
+      target: process.env.ALUMNI_SERVICE_URL || 'http://localhost:3016',
+      changeOrigin: true,
+      pathRewrite: { '^/alumni': '' },
+    }),
+    grievance: createProxyMiddleware({
+      target: process.env.GRIEVANCE_SERVICE_URL || 'http://localhost:3015',
+      changeOrigin: true,
+      pathRewrite: { '^/grievance': '' },
+    }),
+    };
+
 
   @Public()
   @All('auth/*')
@@ -163,6 +169,33 @@ export class ProxyController {
   @All('report/*')
   async proxyReport(@Req() req: Request, @Res() res: Response) {
     this.proxies.report(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+  }
+
+  @All('alumni/*')
+  async proxyAlumni(@Req() req: Request, @Res() res: Response) {
+    this.proxies.alumni(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+  }
+
+  @All('grievance/*')
+  async proxyGrievance(@Req() req: Request, @Res() res: Response) {
+    this.proxies.grievance(req, res, (err) => {
+      if (err) {
+        res.status(500).send(err.message);
+      }
+    });
+  }
+
+  @All('analytics/*')
+  async proxyAnalytics(@Req() req: Request, @Res() res: Response) {
+    this.proxies.analytics(req, res, (err) => {
       if (err) {
         res.status(500).send(err.message);
       }
