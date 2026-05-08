@@ -1,15 +1,15 @@
 import { Controller, Get, Query, Param } from '@nestjs/common';
 import { HallTicketService } from './hall-ticket.service';
 
-@Controller('hall-tickets')
+@Controller('hall-ticket')
 export class HallTicketController {
   constructor(private readonly hallTicketService: HallTicketService) {}
 
-  @Get('eligibility/:studentId')
+  @Get('eligibility')
   async checkEligibility(
-    @Param('studentId') studentId: string,
-    @Query('semester') semester: string,
+    @Query('studentId') studentId: string,
+    @Query('examId') examId: string,
   ) {
-    return this.hallTicketService.checkEligibility(studentId, parseInt(semester, 10));
+    return this.hallTicketService.checkEligibility(studentId, examId);
   }
 }

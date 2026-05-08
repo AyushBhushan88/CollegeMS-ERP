@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api-client';
 
@@ -17,6 +18,7 @@ interface Eligibility {
 }
 
 export function HallTicketDownload() {
+  const { user } = useAuth();
   const [exams, setExams] = useState<Exam[]>([]);
   const [selectedExamId, setSelectedExamId] = useState('');
   const [eligibility, setEligibility] = useState<Eligibility | null>(null);
@@ -54,7 +56,9 @@ export function HallTicketDownload() {
   const checkEligibility = async (examId: string) => {
     try {
       setIsChecking(true);
-      const response = await apiClient.get(`/examination/hall-ticket/eligibility?examId=${examId}`);
+      const response = await apiClient.get(
+        `/examination/hall-ticket/eligibility?examId=${examId}&studentId=${user?.id}`,
+      );
       setEligibility(response.data);
     } catch (error) {
       toast({

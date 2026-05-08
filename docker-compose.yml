@@ -116,6 +116,15 @@ services:
       - GRIEVANCE_SERVICE_URL=http://grievance-service:3015
       - ALUMNI_SERVICE_URL=http://alumni-service:3016
       - ANALYTICS_SERVICE_URL=http://analytics-service:3017
+      - ACADEMIC_SERVICE_URL=http://academic-service:3008
+      - ATTENDANCE_SERVICE_URL=http://attendance-service:3010
+      - EXAMINATION_SERVICE_URL=http://examination-service:3009
+      - HR_SERVICE_URL=http://hr-service:3005
+      - LIBRARY_SERVICE_URL=http://library-service:3007
+      - HOSTEL_SERVICE_URL=http://hostel-service:3011
+      - TRANSPORT_SERVICE_URL=http://transport-service:3013
+      - PLACEMENT_SERVICE_URL=http://placement-service:3012
+      - REPORT_SERVICE_URL=http://report-service:3014
       - JWT_SECRET=supersecret
     depends_on:
       - auth-service
@@ -126,6 +135,15 @@ services:
       - grievance-service
       - alumni-service
       - analytics-service
+      - academic-service
+      - attendance-service
+      - examination-service
+      - hr-service
+      - library-service
+      - hostel-service
+      - transport-service
+      - placement-service
+      - report-service
 
   student-service:
     build:
@@ -233,6 +251,141 @@ services:
       - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
       - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
       - PORT=3017
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  academic-service:
+    build:
+      context: .
+      dockerfile: services/academic-service/Dockerfile
+    container_name: campuscore-academic-service
+    ports:
+      - "3008:3008"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3008
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  attendance-service:
+    build:
+      context: .
+      dockerfile: services/attendance-service/Dockerfile
+    container_name: campuscore-attendance-service
+    ports:
+      - "3010:3010"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3010
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  examination-service:
+    build:
+      context: .
+      dockerfile: services/examination-service/Dockerfile
+    container_name: campuscore-examination-service
+    ports:
+      - "3009:3009"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3009
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  hr-service:
+    build:
+      context: .
+      dockerfile: services/hr-service/Dockerfile
+    container_name: campuscore-hr-service
+    ports:
+      - "3005:3005"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3005
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  library-service:
+    build:
+      context: .
+      dockerfile: services/library-service/Dockerfile
+    container_name: campuscore-library-service
+    ports:
+      - "3007:3007"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3007
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  hostel-service:
+    build:
+      context: .
+      dockerfile: services/hostel-service/Dockerfile
+    container_name: campuscore-hostel-service
+    ports:
+      - "3011:3011"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3011
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  transport-service:
+    build:
+      context: .
+      dockerfile: services/transport-service/Dockerfile
+    container_name: campuscore-transport-service
+    ports:
+      - "3013:3013"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3013
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  placement-service:
+    build:
+      context: .
+      dockerfile: services/placement-service/Dockerfile
+    container_name: campuscore-placement-service
+    ports:
+      - "3012:3012"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3012
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  report-service:
+    build:
+      context: .
+      dockerfile: services/report-service/Dockerfile
+    container_name: campuscore-report-service
+    ports:
+      - "3014:3014"
+    environment:
+      - DATABASE_URL=postgresql://campuscore:campuscore_password@postgres:5432/campuscore_erp?schema=public
+      - RABBITMQ_URL=amqp://campuscore:campuscore_password@rabbitmq:5672
+      - PORT=3014
     depends_on:
       - postgres
       - rabbitmq

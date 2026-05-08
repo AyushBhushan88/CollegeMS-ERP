@@ -1,6 +1,10 @@
 import apiClient from '@/lib/api-client';
 
 export const academicService = {
+  getPrograms: async () => {
+    const response = await apiClient.get('/academic/programs');
+    return response.data;
+  },
   getSubjects: async () => {
     const response = await apiClient.get('/academic/subjects');
     return response.data;
@@ -23,6 +27,10 @@ export const academicService = {
   },
   createTimetableSlot: async (data: any) => {
     const response = await apiClient.post('/academic/timetable', data);
+    return response.data;
+  },
+  generateTimetable: async (sectionId: string) => {
+    const response = await apiClient.post(`/academic/timetable/generate/${sectionId}`);
     return response.data;
   },
 };

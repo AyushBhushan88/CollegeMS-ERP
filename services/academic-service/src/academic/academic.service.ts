@@ -119,4 +119,118 @@ export class AcademicService {
       include: { subject: true, section: true },
     });
   }
+
+  // Program CRUD
+  async getPrograms() {
+    return this.prisma.program.findMany({
+      include: { branches: true },
+    });
+  }
+
+  // OBE Attainment Calculation
+  async calculateOBEAttainment(subjectId: string) {
+    const subject = await this.prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: {
+        courseOutcomes: true,
+        branch: {
+          include: { programOutcomes: true },
+        },
+      },
+    });
+
+    if (!subject) throw new NotFoundException('Subject not found');
+
+    const marks = await this.prisma.marksEntry.findMany({
+      where: { subjectId },
+      include: { exam: true },
+    });
+
+    if (marks.length === 0) {
+      return {
+        subjectId,
+        subjectName: subject.name,
+        attainment: [],
+        message: 'No marks entries found for this subject.',
+      };
+    }
+
+    // Simplified attainment calculation:
+    // % of students scoring above 60% in exams related to this subject
+    const threshold = 0.6;
+    const attainmentResults = subject.courseOutcomes.map((co) => {
+      // In a real system, COs are mapped to specific questions/exams
+      // Here we simplify by using overall subject marks
+      const totalStudents = marks.length;
+      const aboveThreshold = marks.filter(
+        (m) => m.marksObtained / m.exam.totalMarks >= threshold,
+      ).length;
+
+      const percentage = (aboveThreshold / totalStudents) * 100;
+      let level = 0;
+      if (percentage >= 70) level = 3;
+      else if (percentage >= 60) level = 2;
+      else if (percentage >= 50) level = 1;
+
+      return {
+        coCode: co.code,
+        description: co.description,
+        percentage,
+        attainmentLevel: level,
+      };
+    });
+
+    return {
+      subjectId,
+      subjectName: subject.name,
+      attainment: attainmentResults,
+    };
+  }
+
+  async generateAutomatedTimetable(sectionId: string) {
+    const section = await this.getSectionById(sectionId);
+    const subjects = await this.prisma.subject.findMany({
+      where: { branchId: section.branchId, semester: section.semester },
+    });
+
+    const faculties = await this.prisma.user.findMany({
+      where: { role: 'FACULTY' },
+    });
+
+    const days = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
+    const timeSlots = ['09:00', '10:00', '11:00', '14:00', '15:00'];
+
+    const createdSlots: any[] = [];
+
+    // Clear existing slots for the section to avoid conflicts during regeneration
+    await this.prisma.timetableSlot.deleteMany({ where: { sectionId } });
+
+    for (const day of days) {
+      for (const time of timeSlots) {
+        // Randomly pick a subject and a faculty for the demo algorithm
+        const subject = subjects[Math.floor(Math.random() * subjects.length)];
+        const faculty = faculties[Math.floor(Math.random() * faculties.length)];
+
+        if (!subject || !faculty) continue;
+
+        try {
+          const slot = await this.createTimetableSlot({
+            sectionId,
+            subjectId: subject.id,
+            facultyId: faculty.id,
+            dayOfWeek: day as any,
+            startTime: time,
+            endTime: `${parseInt(time.split(':')[0]) + 1}:00`,
+            roomNumber: `ROOM-${Math.floor(Math.random() * 500)}`,
+          });
+          createdSlots.push(slot);
+        } catch (error) {
+          // Skip if conflict detected by thegreedy approach
+          continue;
+        }
+      }
+    }
+
+    return createdSlots;
+  }
 }

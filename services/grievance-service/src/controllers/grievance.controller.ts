@@ -82,6 +82,3 @@ export class GrievanceController {
     return this.grievanceService.createCommittee(body.name, body.members, body.categoryIds);
   }
 }
-oryIds);
-  }
-}

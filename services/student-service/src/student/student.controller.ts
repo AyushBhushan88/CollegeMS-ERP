@@ -6,6 +6,11 @@ import { UpdateStudentDto } from './dto/update-student.dto';
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
+  @Get()
+  async getAllStudents() {
+    return this.studentService.getAllStudents();
+  }
+
   @Get(':id')
   async getStudentDetails(@Param('id') id: string) {
     return this.studentService.getStudentDetails(id);

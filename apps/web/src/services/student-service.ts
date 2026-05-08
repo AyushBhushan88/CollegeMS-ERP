@@ -1,6 +1,10 @@
 import apiClient from '@/lib/api-client';
 
 export const studentService = {
+  getAllStudents: async () => {
+    const response = await apiClient.get('/student');
+    return response.data;
+  },
   getStudentsBySection: async (sectionId: string) => {
     const response = await apiClient.get(`/student/section/${sectionId}`);
     return response.data;

@@ -10,6 +10,22 @@ export class StudentService {
     private eventBus: EventBusService,
   ) {}
 
+  async getAllStudents() {
+    return this.prisma.student.findMany({
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        program: true,
+        branch: true,
+      },
+    });
+  }
+
   async getStudentDetails(id: string) {
     const student = await this.prisma.student.findUnique({
       where: { id },

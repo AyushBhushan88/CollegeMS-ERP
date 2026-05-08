@@ -55,4 +55,19 @@ export class AcademicController {
   getTimetableByFaculty(@Param('facultyId') facultyId: string) {
     return this.academicService.getTimetableByFaculty(facultyId);
   }
+
+  @Post('timetable/generate/:sectionId')
+  generateTimetable(@Param('sectionId') sectionId: string) {
+    return this.academicService.generateAutomatedTimetable(sectionId);
+  }
+
+  @Get('programs')
+  getPrograms() {
+    return this.academicService.getPrograms();
+  }
+
+  @Get('obe/attainment/:subjectId')
+  calculateOBEAttainment(@Param('subjectId') subjectId: string) {
+    return this.academicService.calculateOBEAttainment(subjectId);
+  }
 }

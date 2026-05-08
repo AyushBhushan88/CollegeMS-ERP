@@ -81,6 +81,16 @@ export class ProxyController {
       changeOrigin: true,
       pathRewrite: { '^/grievance': '' },
     }),
+    transport: createProxyMiddleware({
+      target: process.env.TRANSPORT_SERVICE_URL || 'http://localhost:3013',
+      changeOrigin: true,
+      pathRewrite: { '^/transport': '' },
+    }),
+    analytics: createProxyMiddleware({
+      target: process.env.ANALYTICS_SERVICE_URL || 'http://localhost:3017',
+      changeOrigin: true,
+      pathRewrite: { '^/analytics': '' },
+    }),
     };
 
 

@@ -15,7 +15,7 @@ export interface AttendanceResult {
 export class HallTicketService {
   constructor(private prisma: PrismaService) {}
 
-  async checkEligibility(studentId: string, semester: number): Promise<any> {
+  async checkEligibility(studentId: string, examId: string): Promise<any> {
     const student = await this.prisma.student.findUnique({
       where: { id: studentId },
     });
@@ -23,6 +23,17 @@ export class HallTicketService {
     if (!student) {
       throw new BadRequestException('Student not found');
     }
+
+    const exam = await this.prisma.exam.findUnique({
+      where: { id: examId },
+    });
+
+    if (!exam) {
+      throw new BadRequestException('Exam not found');
+    }
+
+    const semester = exam.semester;
+    const reasons: string[] = [];
 
     // 1. Check Attendance > 75% for all subjects in the semester
     const subjects = await this.prisma.subject.findMany({
@@ -36,6 +47,7 @@ export class HallTicketService {
       throw new BadRequestException(`No subjects found for semester ${semester}`);
     }
 
+    let totalPercentage = 0;
     const attendanceResults: AttendanceResult[] = [];
     for (const subject of subjects) {
       const records = await this.prisma.attendanceRecord.findMany({
@@ -54,6 +66,7 @@ export class HallTicketService {
           totalClasses: 0,
           attendedClasses: 0,
         });
+        totalPercentage += 100;
         continue;
       }
 
@@ -65,6 +78,7 @@ export class HallTicketService {
       ).length;
 
       const percentage = (attendedCount / records.length) * 100;
+      totalPercentage += percentage;
       attendanceResults.push({
         subjectId: subject.id,
         subjectName: subject.name,
@@ -75,7 +89,11 @@ export class HallTicketService {
       });
     }
 
+    const avgAttendance = totalPercentage / subjects.length;
     const isAttendanceEligible = attendanceResults.every((r) => r.eligible);
+    if (!isAttendanceEligible) {
+      reasons.push('Minimum 75% attendance required in all subjects');
+    }
 
     // 2. Check all mandatory fees for the semester must be paid
     const feeStructure = await this.prisma.feeStructure.findFirst({
@@ -91,8 +109,6 @@ export class HallTicketService {
     let feeDetails: any = null;
 
     if (!feeStructure) {
-      // If no fee structure defined, we might want to assume eligible or handle as error
-      // In many systems, no fee structure means no fees to pay.
       isFeesEligible = true;
       feeDetails = {
         message: 'No fee structure found for this semester',
@@ -112,9 +128,10 @@ export class HallTicketService {
         0,
       );
       
-      // All mandatory fees must be paid.
-      // Usually feeStructure.totalAmount includes mandatory fees.
       isFeesEligible = totalPaid >= Number(feeStructure.totalAmount);
+      if (!isFeesEligible) {
+        reasons.push('Pending semester fees');
+      }
       
       feeDetails = {
         totalAmount: Number(feeStructure.totalAmount),
@@ -125,11 +142,14 @@ export class HallTicketService {
 
     return {
       studentId,
-      studentName: `${student.enrollmentNumber}`, // Simplification
+      studentName: student.enrollmentNumber,
       semester,
       isEligible: isAttendanceEligible && isFeesEligible,
       isAttendanceEligible,
       isFeesEligible,
+      attendancePercentage: Math.round(avgAttendance),
+      feesPaid: isFeesEligible,
+      reasons,
       attendanceResults,
       feeDetails,
     };
